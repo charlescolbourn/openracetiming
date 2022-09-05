@@ -76,12 +76,16 @@ const App = () => {
       setStartTimeLocalStorage(Date.now());
       setShowStarted(true);
       //NfcManager.start();
+      NfcManager.requestTechnology(NfcTech.Ndef).then ( () => {
+//         alert('got tag');
 
-        NfcManager.requestTechnology(NfcTech.Ndef).then( ()=> {
         NfcManager.getTag().then( (event) => {
+//         alert('writing event');
           writeTime(event.id);
       }).catch( (e) => alert(e));
-     }).catch( (e) => alert(e));
+      }).catch( (e) => alert(e));
+
+
   }
 
   const resetSession = () => {
@@ -96,8 +100,12 @@ const App = () => {
   };
 
 
+  if (!showStarted) {
   initialiseFromLocalStorage();
-  NfcManager.registerTagEvent().then( () => { () => buttonsDisabled=false }).catch( (e) alert(e));
+//   NfcManager.start();
+  }
+//     NfcManager.requestTechnology(NfcTech.Ndef).catch ( (e) => alert(e));
+
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
@@ -110,13 +118,13 @@ const App = () => {
                           writeTime();
                       }}
                       title="Record a finish"
-                      disabled=buttonsDisabled
+//                       disabled={buttonsDisabled}
                      />
            :
           <Button
             onPress={() => startEvent()}
             title="Start"
-            disabled=buttonsDisabled
+//             disabled={buttonsDisabled}
           />}
 
         <Text name="startTime">{startTime ? new Date(startTime).toLocaleString() : ''}</Text>
