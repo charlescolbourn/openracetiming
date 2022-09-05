@@ -77,7 +77,6 @@ const App = () => {
       setShowStarted(true);
       //NfcManager.start();
       NfcManager.requestTechnology(NfcTech.Ndef).then ( () => {
-//         alert('got tag');
 
         NfcManager.getTag().then( (event) => {
 //         alert('writing event');
@@ -93,6 +92,7 @@ const App = () => {
     setResultsContent("");
     setStartTime(0);
     removeStartTimeLocalStorage();
+    NfcManager.cancelTechnologyRequest();
   }
 
   const backgroundStyle = {
@@ -100,12 +100,16 @@ const App = () => {
   };
 
 
-  if (!showStarted) {
   initialiseFromLocalStorage();
 //   NfcManager.start();
-  }
+
+
 //     NfcManager.requestTechnology(NfcTech.Ndef).catch ( (e) => alert(e));
 
+  React.useEffect( ()=> {
+    const initNfc = async () => { await NfcManager.registerTagEvent()};
+    initNfc().catch( (e) => alert(e));
+  });
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
