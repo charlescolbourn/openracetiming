@@ -103,7 +103,14 @@ const App = () => {
 //           }).catch( (e) => alert(e));
 //           }).catch( (e) => alert(e));
     NfcManager.setEventListener(NfcEvents.DiscoverTag, (tag) => {
+        if (showStarted) {
           writeTime(tag.id);
+
+        }
+        else {
+            setResultsContent("Testing NFC tag: " + tag.id);
+
+        }
           });
 //   }
   });
