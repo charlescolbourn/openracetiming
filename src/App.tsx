@@ -9,7 +9,7 @@
  */
 
 import React, {type PropsWithChildren} from 'react';
-import NfcManager, {NfcTech} from 'react-native-nfc-manager';
+import NfcManager, {NfcTech, NfcEvents,Ndef} from 'react-native-nfc-manager';
 import {
   SafeAreaView,
   ScrollView,
@@ -81,7 +81,6 @@ const App = () => {
   const writeTime = (entrantId:string="unknown") => {
 //   alert(resultsContent);
         const timeNow = Date.now();
-        entrantId = entrantId + timeNow;
         getStartTimeLocalStorage().then( (startTime) => {
           const elapsed = new Date(timeNow - startTime);
           writeFinishTimeLocalStorage(elapsed.getTime(),entrantId).then( () => {
@@ -94,23 +93,27 @@ const App = () => {
     }
 
 
-
-  const readTag = () => {
-    NfcManager.requestTechnology(NfcTech.Ndef).then ( () => {
-            NfcManager.getTag().then( (event) => {
-              writeTime(event.id);
-              NfcManager.cancelTechnologyRequest().then ( () => {readTag()});
-
-          }).catch( (e) => alert(e));
-          }).catch( (e) => alert(e));
-  }
+  React.useEffect( () => {
+//   const readTag = () => {
+//     NfcManager.requestTechnology(NfcTech.Ndef).then ( () => {
+//             NfcManager.getTag().then( (event) => {
+//               writeTime(event.id);
+//               NfcManager.cancelTechnologyRequest().then ( () => {readTag()});
+//
+//           }).catch( (e) => alert(e));
+//           }).catch( (e) => alert(e));
+    NfcManager.setEventListener(NfcEvents.DiscoverTag, (tag) => {
+          writeTime(tag.id);
+          });
+//   }
+  });
 
   const startEvent = () => {
       const now = Date.now();
       setStartTime(now);
       setStartTimeLocalStorage(now);
       setShowStarted(true);
-      readTag();
+//       readTag();
 
 
   }
@@ -148,6 +151,7 @@ const App = () => {
 //     NfcManager.requestTechnology(NfcTech.Ndef).catch ( (e) => alert(e));
 
   React.useEffect( ()=> {
+
     const initNfc = async () => { await NfcManager.registerTagEvent()};
     initNfc().catch( (e) => alert(e));
   });
