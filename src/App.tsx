@@ -26,73 +26,115 @@ import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
 
-// async function readNdef() {
-//     try {
-//       // register for the NFC tag with NDEF in it
-//       await NfcManager.requestTechnology(NfcTech.Ndef);
-//       // the resolved tag object will contain `ndefMessage` property
-//       const tag = await NfcManager.getTag();
-//       console.warn('Tag found', tag);
-//     } catch (ex) {
-//       console.warn('Oops!', ex);
-//     } finally {
-//       // stop the nfc scanning
-//       NfcManager.cancelTechnologyRequest();
-//     }
-
-
-
-
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
   const [showStarted, setShowStarted] = React.useState(false);
   const [startTime, setStartTime] = React.useState(0);
   const [resultsContent, setResultsContent] = React.useState("");
-  let buttonsDisabled=true;
+//   let showStarted = false;
+//   let startTime = 0;
+//   let resultsContent = "";
+
+
 
   const initialiseFromLocalStorage = () => {
-    AsyncStorage.getItem('@ORT_starttimes:default').then( (timestamp: string) => {
+    getStartTimeLocalStorage().then( (timestamp: string) => {
     setStartTime(parseInt(timestamp));
-    if (startTime) { setShowStarted(true); }
+    if (startTime) {
+     setShowStarted(true);
+     //loadResultsFromLocalStorage();
+    }
+    }).catch( (e) => alert(e));
+  }
+
+
+  const setStartTimeLocalStorage = (timestamp:double) => {
+    return AsyncStorage.setItem('@ORT_starttimes:default',`${timestamp}`);
+  }
+  const removeStartTimeLocalStorage = () => {
+    return AsyncStorage.removeItem('@ORT_starttimes:default');
+  }
+  const getStartTimeLocalStorage = () => {
+    return AsyncStorage.getItem('@ORT_starttimes:default');
+  }
+
+  const writeFinishTimeLocalStorage = (timestamp:string, id: string) => {
+    return AsyncStorage.setItem(`@ORT_finishtimes:${id}`,`${timestamp}`);
+  }
+
+  const displayResultsFromLocalContent = () => {
+    AsyncStorage.getAllKeys().then( (arrayOfKeys) => {
+      arrayOfKeys.forEach( (key) => {
+        if (key.startsWith('@ORT_finishtimes')) {
+          const id = key.substring(17, key.length);
+          const time = AsyncStorage.getItem(key).then( (item) => {
+            const elapsed = new Date(item);
+            const timeString = `${elapsed.getHours()}:${elapsed.getMinutes()}:${elapsed.getSeconds()}`;
+            setResultsContent(resultsContent + "\n" + id + " - " + timeString);
+            }).catch( (e) => alert(e));
+        }
+      });
+
     });
   }
 
-  const setStartTimeLocalStorage = (timestamp:double) => {
-    AsyncStorage.setItem('@ORT_starttimes:default',`${timestamp}`).catch( (e) => alert(e));;
-  }
-  const removeStartTimeLocalStorage = () => {
-    AsyncStorage.removeItem('@ORT_starttimes:default');
-  }
-  const getStartTimeLocalStorage = () => {
-    const timePromise = AsyncStorage.getItem('@ORT_starttimes:default').catch( (e) => alert(e));
-    return parseInt(timePromise);
-  }
   const writeTime = (entrantId:string="unknown") => {
-        const elapsed = new Date(Date.now() - startTime);
-        const timeString = `${entrantId} - ${elapsed.getHours()}:${elapsed.getMinutes()}:${elapsed.getSeconds()}`;
-        setResultsContent(`${resultsContent}\n${timeString}`);
+//   alert(resultsContent);
+        const timeNow = Date.now();
+        entrantId = entrantId + timeNow;
+        getStartTimeLocalStorage().then( (startTime) => {
+          const elapsed = new Date(timeNow - startTime);
+          writeFinishTimeLocalStorage(elapsed.getTime(),entrantId).then( () => {
+            const timeString = `${elapsed.getHours()}:${elapsed.getMinutes()}:${elapsed.getSeconds()}`;
+            setResultsContent(`${resultsContent}\n${entrantId} - ${timeString}`);
+            //displayResultsFromLocalContent();
+            }).catch( (e) => alert(e));
+          }).catch( (e) => alert(e));
+        //});
     }
-  const startEvent = () => {
-      setStartTimeLocalStorage(Date.now());
-      setShowStarted(true);
-      //NfcManager.start();
-      NfcManager.requestTechnology(NfcTech.Ndef).then ( () => {
 
-        NfcManager.getTag().then( (event) => {
-//         alert('writing event');
-          writeTime(event.id);
-      }).catch( (e) => alert(e));
-      }).catch( (e) => alert(e));
+
+
+  const readTag = () => {
+    NfcManager.requestTechnology(NfcTech.Ndef).then ( () => {
+            NfcManager.getTag().then( (event) => {
+              writeTime(event.id);
+              NfcManager.cancelTechnologyRequest().then ( () => {readTag()});
+
+          }).catch( (e) => alert(e));
+          }).catch( (e) => alert(e));
+  }
+
+  const startEvent = () => {
+      const now = Date.now();
+      setStartTime(now);
+      setStartTimeLocalStorage(now);
+      setShowStarted(true);
+      readTag();
 
 
   }
+
+  const finishRace = () => {
+    setShowStarted(false);
+    setStartTime(0);
+    setStartTimeLocalStorage(0);
+    NfcManager.cancelTechnologyRequest().catch((e)=>alert(e));
+     displayResultsFromLocalContent();
+//setResultsContent("");
+  }
+
+
 
   const resetSession = () => {
     setShowStarted(false);
     setResultsContent("");
     setStartTime(0);
-    removeStartTimeLocalStorage();
-    NfcManager.cancelTechnologyRequest();
+//     removeStartTimeLocalStorage();
+//     removeFinishTimesLocalStorage();
+    AsyncStorage.clear();
+//     tempRemoveResultContentLocalStorage();
+    NfcManager.cancelTechnologyRequest().catch((e)=>alert(e));
   }
 
   const backgroundStyle = {
@@ -100,7 +142,6 @@ const App = () => {
   };
 
 
-  initialiseFromLocalStorage();
 //   NfcManager.start();
 
 
@@ -110,6 +151,9 @@ const App = () => {
     const initNfc = async () => { await NfcManager.registerTagEvent()};
     initNfc().catch( (e) => alert(e));
   });
+
+  if (!showStarted) {initialiseFromLocalStorage();}
+// initialiseFromLocalStorage();
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
@@ -138,6 +182,12 @@ const App = () => {
                           resetSession();
                       }}
                       title="Reset"
+                     />
+        <Button
+                      onPress={() => {
+                          finishRace();
+                      }}
+                      title="Finish"
                      />
       </ScrollView>
     </SafeAreaView>
