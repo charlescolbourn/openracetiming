@@ -12,13 +12,16 @@ const Timing = () => {
 	const [showStarted, setShowStarted] = React.useState(false);
 	const [startTime, setStartTime] = React.useState(0);
 	const [resultsContent, setResultsContent] = React.useState('');
+	const [displayButtons, setDisplayButtons] = React.useState(false);
 
 	const initialiseFromLocalStorage = () => {
+		//need to handle case where race is finished
 		getStartTimeLocalStorage()
 			.then((timestamp: string | null) => {
 				if (timestamp) {
 					setStartTime(parseInt(timestamp));
 					setShowStarted(true);
+					setDisplayButtons(true);
 				}
 			})
 			.catch((e) => Alert.alert(JSON.stringify(e)));
@@ -86,6 +89,7 @@ const Timing = () => {
 		setStartTime(now);
 		setStartTimeLocalStorage(now);
 		setShowStarted(true);
+		setDisplayButtons(true);
 	};
 
 	const finishRace = () => {
@@ -96,6 +100,7 @@ const Timing = () => {
 			Alert.alert(JSON.stringify(e))
 		);
 		displayResultsFromLocalContent();
+		setDisplayButtons(false);
 	};
 
 	const resetSession = () => {
@@ -130,7 +135,6 @@ const Timing = () => {
 						writeTime();
 					}}
 					title="Record a finish"
-					disabled={!startTime}
 				/>
 			) : (
 				<Button onPress={() => startEvent()} title="Start" />
@@ -143,13 +147,13 @@ const Timing = () => {
 					resetSession();
 				}}
 				title="Reset"
-				disabled={!startTime}
+				// 				disabled={displayButtons} reenable when finish is handled better
 			/>
 			<Button
 				onPress={() => {
 					finishRace();
 				}}
-				disabled={!startTime}
+				disabled={!displayButtons}
 				title="Finish"
 			/>
 		</View>
