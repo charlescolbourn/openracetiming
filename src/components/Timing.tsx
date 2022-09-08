@@ -10,9 +10,10 @@ import {
   useColorScheme,
   View,
   Button,
-  AsyncStorage,
   Alert,
 } from 'react-native';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {
   Colors,
@@ -26,11 +27,11 @@ const Timing = () => {
 
   const initialiseFromLocalStorage = () => {
     getStartTimeLocalStorage().then( (timestamp: string|null) => {
-    if (timestamp) setStartTime(parseInt(timestamp));
-    if (startTime) {
-     setShowStarted(true);
+    if (timestamp) {
+      setStartTime(parseInt(timestamp));
+      setShowStarted(true);
     }
-    }).catch( (e) => Alert.alert(e));
+    }).catch( (e) => Alert.alert(JSON.stringify(e)));
   }
 
 
@@ -58,7 +59,7 @@ const Timing = () => {
             const elapsed = new Date(item);
             const timeString = `${elapsed.getHours()}:${elapsed.getMinutes()}:${elapsed.getSeconds()}`;
             setResultsContent(resultsContent + "\n" + id + " - " + timeString);
-            }).catch( (e) => Alert.alert(e));
+            }).catch( (e) => Alert.alert(JSON.stringify(e)));
         }
       });
     });
@@ -71,8 +72,7 @@ const Timing = () => {
           writeFinishTimeLocalStorage(elapsed.getTime(),entrantId).then( () => {
             const timeString = `${elapsed.getHours()}:${elapsed.getMinutes()}:${elapsed.getSeconds()}`;
             setResultsContent(`${resultsContent}\n${entrantId} - ${timeString}`);
-            }).catch( (e) => Alert.alert(e));
-          //}).catch( (e) => Alert.alert(e));
+            }).catch( (e) => Alert.alert(JSON.stringify(e)));
     }
 
 
@@ -99,7 +99,7 @@ const Timing = () => {
     setShowStarted(false);
     setStartTime(0);
     setStartTimeLocalStorage(0);
-    NfcManager.cancelTechnologyRequest().catch((e)=>Alert.alert(e));
+    NfcManager.cancelTechnologyRequest().catch((e)=>Alert.alert(JSON.stringify(e)));
     displayResultsFromLocalContent();
   }
 
@@ -110,7 +110,7 @@ const Timing = () => {
     setResultsContent("");
     setStartTime(0);
     AsyncStorage.clear();
-    NfcManager.cancelTechnologyRequest().catch((e)=>Alert.alert(e));
+    NfcManager.cancelTechnologyRequest().catch((e)=>Alert.alert(JSON.stringify(e)));
   }
 
   const backgroundStyle = {
@@ -119,9 +119,8 @@ const Timing = () => {
 
 
   React.useEffect( ()=> {
-
     const initNfc = async () => { await NfcManager.registerTagEvent()};
-    initNfc().catch( (e) => Alert.alert(e));
+    initNfc().catch( (e) => Alert.alert(JSON.stringify(e)));
   });
 
   if (!showStarted) {initialiseFromLocalStorage();}
@@ -132,13 +131,12 @@ const Timing = () => {
                           writeTime();
                       }}
                       title="Record a finish"
-//                       disabled={buttonsDisabled}
+                      disabled={!startTime}
                      />
            :
           <Button
             onPress={() => startEvent()}
             title="Start"
-//             disabled={buttonsDisabled}
           />}
 
         <Text>{startTime ? new Date(startTime).toLocaleString() : ''}</Text>
@@ -148,11 +146,13 @@ const Timing = () => {
                           resetSession();
                       }}
                       title="Reset"
+                      disabled={!startTime}
                      />
         <Button
                       onPress={() => {
                           finishRace();
                       }}
+                      disabled={!startTime}
                       title="Finish"
                      />
         </View>
