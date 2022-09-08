@@ -19,7 +19,7 @@ import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
 
-import { Timing } from "./components/Timing";
+import Timing from "./components/Timing";
 
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';

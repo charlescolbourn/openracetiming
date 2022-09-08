@@ -11,6 +11,7 @@ import {
   View,
   Button,
   AsyncStorage,
+  Alert,
 } from 'react-native';
 
 import {
@@ -24,16 +25,16 @@ const Timing = () => {
   const [resultsContent, setResultsContent] = React.useState("");
 
   const initialiseFromLocalStorage = () => {
-    getStartTimeLocalStorage().then( (timestamp: string) => {
-    setStartTime(parseInt(timestamp));
+    getStartTimeLocalStorage().then( (timestamp: string|null) => {
+    if (timestamp) setStartTime(parseInt(timestamp));
     if (startTime) {
      setShowStarted(true);
     }
-    }).catch( (e) => alert(e));
+    }).catch( (e) => Alert.alert(e));
   }
 
 
-  const setStartTimeLocalStorage = (timestamp:double) => {
+  const setStartTimeLocalStorage = (timestamp:number) => {
     return AsyncStorage.setItem('@ORT_starttimes:default',`${timestamp}`);
   }
   const removeStartTimeLocalStorage = () => {
@@ -43,7 +44,7 @@ const Timing = () => {
     return AsyncStorage.getItem('@ORT_starttimes:default');
   }
 
-  const writeFinishTimeLocalStorage = (timestamp:double, id: string) => {
+  const writeFinishTimeLocalStorage = (timestamp:number, id: string) => {
     return AsyncStorage.setItem(`@ORT_finishtimes:${id}`,`${timestamp}`);
   }
 
@@ -53,10 +54,11 @@ const Timing = () => {
         if (key.startsWith('@ORT_finishtimes')) {
           const id = key.substring(17, key.length);
           const time = AsyncStorage.getItem(key).then( (item) => {
+            if (!item) throw 'Stored finish time is null';
             const elapsed = new Date(item);
             const timeString = `${elapsed.getHours()}:${elapsed.getMinutes()}:${elapsed.getSeconds()}`;
             setResultsContent(resultsContent + "\n" + id + " - " + timeString);
-            }).catch( (e) => alert(e));
+            }).catch( (e) => Alert.alert(e));
         }
       });
     });
@@ -64,18 +66,18 @@ const Timing = () => {
 
   const writeTime = (entrantId:string="unknown") => {
         const timeNow = Date.now();
-        getStartTimeLocalStorage().then( (startTime) => {
+        //getStartTimeLocalStorage().then( (startTime) => {
           const elapsed = new Date(timeNow - startTime);
           writeFinishTimeLocalStorage(elapsed.getTime(),entrantId).then( () => {
             const timeString = `${elapsed.getHours()}:${elapsed.getMinutes()}:${elapsed.getSeconds()}`;
             setResultsContent(`${resultsContent}\n${entrantId} - ${timeString}`);
-            }).catch( (e) => alert(e));
-          }).catch( (e) => alert(e));
+            }).catch( (e) => Alert.alert(e));
+          //}).catch( (e) => Alert.alert(e));
     }
 
 
   React.useEffect( () => {
-    NfcManager.setEventListener(NfcEvents.DiscoverTag, (tag) => {
+    NfcManager.setEventListener(NfcEvents.DiscoverTag, (tag:any) => {
         if (showStarted) {
           writeTime(tag.id);
 
@@ -97,7 +99,7 @@ const Timing = () => {
     setShowStarted(false);
     setStartTime(0);
     setStartTimeLocalStorage(0);
-    NfcManager.cancelTechnologyRequest().catch((e)=>alert(e));
+    NfcManager.cancelTechnologyRequest().catch((e)=>Alert.alert(e));
     displayResultsFromLocalContent();
   }
 
@@ -107,10 +109,8 @@ const Timing = () => {
     setShowStarted(false);
     setResultsContent("");
     setStartTime(0);
-//     removeStartTimeLocalStorage();
-//     removeFinishTimesLocalStorage();
     AsyncStorage.clear();
-    NfcManager.cancelTechnologyRequest().catch((e)=>alert(e));
+    NfcManager.cancelTechnologyRequest().catch((e)=>Alert.alert(e));
   }
 
   const backgroundStyle = {
@@ -121,11 +121,11 @@ const Timing = () => {
   React.useEffect( ()=> {
 
     const initNfc = async () => { await NfcManager.registerTagEvent()};
-    initNfc().catch( (e) => alert(e));
+    initNfc().catch( (e) => Alert.alert(e));
   });
 
   if (!showStarted) {initialiseFromLocalStorage();}
-  return (<div>
+  return (<View>
           {showStarted ?
            <Button
                       onPress={() => {
@@ -141,8 +141,8 @@ const Timing = () => {
 //             disabled={buttonsDisabled}
           />}
 
-        <Text name="startTime">{startTime ? new Date(startTime).toLocaleString() : ''}</Text>
-        <Text name="resultsPane">{resultsContent}</Text>
+        <Text>{startTime ? new Date(startTime).toLocaleString() : ''}</Text>
+        <Text>{resultsContent}</Text>
         <Button
                       onPress={() => {
                           resetSession();
@@ -155,7 +155,7 @@ const Timing = () => {
                       }}
                       title="Finish"
                      />
-</div>
+        </View>
   );
 };
 
