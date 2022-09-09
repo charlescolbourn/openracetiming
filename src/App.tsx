@@ -2,61 +2,54 @@
 
  */
 
-import React, {type PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-  Button,
-  AsyncStorage,
-} from 'react-native';
+import Timing from './components/Timing';
+import Identify from './components/Identify';
+import Registration from './components/Registration';
 
-import {
-  Colors,
-} from 'react-native/Libraries/NewAppScreen';
+import * as React from 'react';
+import { View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-import Timing from "./components/Timing";
+//eslint-disable-next-line
+function RegistrationScreen() {
+	return (
+		<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+			<Registration />
+		</View>
+	);
+}
+
+//eslint-disable-next-line
+function TimingScreen() {
+	return (
+		<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+			<Timing />
+		</View>
+	);
+}
+
+//eslint-disable-next-line
+function IdentifyScreen() {
+	return (
+		<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+			<Identify />
+		</View>
+	);
+}
+
+const Tab = createBottomTabNavigator();
 
 const App = () => {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Timing/>
-      </ScrollView>
-    </SafeAreaView>
-  );
+	return (
+		<NavigationContainer>
+			<Tab.Navigator>
+				<Tab.Screen name="Registration" component={Registration} />
+				<Tab.Screen name="Timing" component={Timing} />
+				<Tab.Screen name="Identify" component={Identify} />
+			</Tab.Navigator>
+		</NavigationContainer>
+	);
 };
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
 
 export default App;

@@ -2,180 +2,167 @@
 
  */
 
-import React, {type PropsWithChildren} from 'react';
-import NfcManager, {NfcTech, NfcEvents,Ndef} from 'react-native-nfc-manager';
-import {
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-  Button,
-  AsyncStorage,
-  Alert,
-} from 'react-native';
+import React from 'react';
+import NfcManager, { NfcEvents } from 'react-native-nfc-manager';
+import { Text, View, Button, Alert } from 'react-native';
 
-import {
-  Colors,
-} from 'react-native/Libraries/NewAppScreen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Timing = () => {
-  const isDarkMode = useColorScheme() === 'dark';
-  const [showStarted, setShowStarted] = React.useState(false);
-  const [startTime, setStartTime] = React.useState(0);
-  const [resultsContent, setResultsContent] = React.useState("");
+const Timing = ({ navigation }) => {
+	const [showStarted, setShowStarted] = React.useState(false);
+	const [startTime, setStartTime] = React.useState(0);
+	const [resultsContent, setResultsContent] = React.useState('');
+	const [displayButtons, setDisplayButtons] = React.useState(false);
+	const [finished, setFinished] = React.useState(false);
 
-  const initialiseFromLocalStorage = () => {
-    getStartTimeLocalStorage().then( (timestamp: string|null) => {
-    if (timestamp) setStartTime(parseInt(timestamp));
-    if (startTime) {
-     setShowStarted(true);
-    }
-    }).catch( (e) => Alert.alert(e));
-  }
+	const initialiseFromLocalStorage = () => {
+		//need to handle case where race is finished
+		getStartTimeLocalStorage()
+			.then((timestamp: string | null) => {
+				if (timestamp) {
+					setStartTime(parseInt(timestamp));
+					if (!finished) {
+						setShowStarted(true);
+						setDisplayButtons(true);
+					}
+				}
+			})
+			.catch((e) => Alert.alert(JSON.stringify(e)));
+	};
 
+	const setStartTimeLocalStorage = (timestamp: number) => {
+		return AsyncStorage.setItem('@ORT_starttimes:default', `${timestamp}`);
+	};
+	//   const removeStartTimeLocalStorage = () => {
+	//     return AsyncStorage.removeItem('@ORT_starttimes:default');
+	//   }
+	const getStartTimeLocalStorage = () => {
+		return AsyncStorage.getItem('@ORT_starttimes:default');
+	};
 
-  const setStartTimeLocalStorage = (timestamp:number) => {
-    return AsyncStorage.setItem('@ORT_starttimes:default',`${timestamp}`);
-  }
-  const removeStartTimeLocalStorage = () => {
-    return AsyncStorage.removeItem('@ORT_starttimes:default');
-  }
-  const getStartTimeLocalStorage = () => {
-    return AsyncStorage.getItem('@ORT_starttimes:default');
-  }
+	const writeFinishTimeLocalStorage = (timestamp: number, id: string) => {
+		return AsyncStorage.setItem(`@ORT_finishtimes:${id}`, `${timestamp}`);
+	};
 
-  const writeFinishTimeLocalStorage = (timestamp:number, id: string) => {
-    return AsyncStorage.setItem(`@ORT_finishtimes:${id}`,`${timestamp}`);
-  }
+	// 	const displayResultsFromLocalContent = () => {
+	// 		AsyncStorage.getAllKeys().then((arrayOfKeys) => {
+	// 			arrayOfKeys.forEach((key) => {
+	// 				if (key.startsWith('@ORT_finishtimes')) {
+	// 					const id = key.substring(17, key.length);
+	// 					AsyncStorage.getItem(key)
+	// 						.then((item) => {
+	// 							if (!item) {
+	// 								throw 'Stored finish time is null';
+	// 							}
+	// 							const elapsed = new Date(item);
+	// 							const timeString = `${elapsed.getHours()}:${elapsed.getMinutes()}:${elapsed.getSeconds()}`;
+	// 							setResultsContent(
+	// 								resultsContent + '\n' + id + ' - ' + timeString
+	// 							);
+	// 						})
+	// 						.catch((e) => Alert.alert(JSON.stringify(e)));
+	// 				}
+	// 			});
+	// 		});
+	// 	};
 
-  const displayResultsFromLocalContent = () => {
-    AsyncStorage.getAllKeys().then( (arrayOfKeys) => {
-      arrayOfKeys.forEach( (key) => {
-        if (key.startsWith('@ORT_finishtimes')) {
-          const id = key.substring(17, key.length);
-          const time = AsyncStorage.getItem(key).then( (item) => {
-            if (!item) throw 'Stored finish time is null';
-            const elapsed = new Date(item);
-            const timeString = `${elapsed.getHours()}:${elapsed.getMinutes()}:${elapsed.getSeconds()}`;
-            setResultsContent(resultsContent + "\n" + id + " - " + timeString);
-            }).catch( (e) => Alert.alert(e));
-        }
-      });
-    });
-  }
+	const writeTime = (entrantId: string = 'unknown') => {
+		const timeNow = Date.now();
+		const elapsed = new Date(timeNow - startTime);
+		writeFinishTimeLocalStorage(elapsed.getTime(), entrantId)
+			.then(() => {
+				const timeString = `${elapsed.getHours()}:${elapsed.getMinutes()}:${elapsed.getSeconds()}`;
+				setResultsContent(`${resultsContent}\n${entrantId} - ${timeString}`);
+			})
+			.catch((e) => Alert.alert(JSON.stringify(e)));
+	};
 
-  const writeTime = (entrantId:string="unknown") => {
-        const timeNow = Date.now();
-        //getStartTimeLocalStorage().then( (startTime) => {
-          const elapsed = new Date(timeNow - startTime);
-          writeFinishTimeLocalStorage(elapsed.getTime(),entrantId).then( () => {
-            const timeString = `${elapsed.getHours()}:${elapsed.getMinutes()}:${elapsed.getSeconds()}`;
-            setResultsContent(`${resultsContent}\n${entrantId} - ${timeString}`);
-            }).catch( (e) => Alert.alert(e));
-          //}).catch( (e) => Alert.alert(e));
-    }
+	React.useEffect(() => {
+		NfcManager.setEventListener(NfcEvents.DiscoverTag, (tag: any) => {
+			if (showStarted) {
+				writeTime(tag.id);
+			} else {
+				setResultsContent('Testing NFC tag: ' + tag.id);
+			}
+		});
+	});
 
+	const startEvent = () => {
+		const now = Date.now();
+		setStartTime(now);
+		setStartTimeLocalStorage(now);
+		setShowStarted(true);
+		setDisplayButtons(true);
+	};
 
-  React.useEffect( () => {
-    NfcManager.setEventListener(NfcEvents.DiscoverTag, (tag:any) => {
-        if (showStarted) {
-          writeTime(tag.id);
+	const finishRace = () => {
+		setShowStarted(false);
+		NfcManager.cancelTechnologyRequest().catch((e) =>
+			Alert.alert(JSON.stringify(e))
+		);
+		//displayResultsFromLocalContent();
 
-        }
-        else {
-            setResultsContent("Testing NFC tag: " + tag.id);
-        }
-    });
-  });
+		setDisplayButtons(false);
+		setFinished(true);
+		setShowStarted(false);
+		navigation.jumpTo('Identify');
+	};
 
-  const startEvent = () => {
-      const now = Date.now();
-      setStartTime(now);
-      setStartTimeLocalStorage(now);
-      setShowStarted(true);
-  }
+	const resetSession = () => {
+		setShowStarted(false);
+		setResultsContent('');
+		setStartTime(0);
+		AsyncStorage.clear();
+		NfcManager.cancelTechnologyRequest().catch((e) =>
+			Alert.alert(JSON.stringify(e))
+		);
+	};
 
-  const finishRace = () => {
-    setShowStarted(false);
-    setStartTime(0);
-    setStartTimeLocalStorage(0);
-    NfcManager.cancelTechnologyRequest().catch((e)=>Alert.alert(e));
-    displayResultsFromLocalContent();
-  }
+	//   const backgroundStyle = {
+	//     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+	//   };
 
+	React.useEffect(() => {
+		const initNfc = async () => {
+			await NfcManager.registerTagEvent();
+		};
+		initNfc().catch((e) => Alert.alert(JSON.stringify(e)));
+	});
 
+	if (!showStarted) {
+		initialiseFromLocalStorage();
+	}
+	return (
+		<View>
+			{showStarted ? (
+				<Button
+					onPress={() => {
+						writeTime();
+					}}
+					title="Record a finish"
+				/>
+			) : (
+				<Button onPress={() => startEvent()} title="Start" />
+			)}
 
-  const resetSession = () => {
-    setShowStarted(false);
-    setResultsContent("");
-    setStartTime(0);
-    AsyncStorage.clear();
-    NfcManager.cancelTechnologyRequest().catch((e)=>Alert.alert(e));
-  }
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-
-  React.useEffect( ()=> {
-
-    const initNfc = async () => { await NfcManager.registerTagEvent()};
-    initNfc().catch( (e) => Alert.alert(e));
-  });
-
-  if (!showStarted) {initialiseFromLocalStorage();}
-  return (<View>
-          {showStarted ?
-           <Button
-                      onPress={() => {
-                          writeTime();
-                      }}
-                      title="Record a finish"
-//                       disabled={buttonsDisabled}
-                     />
-           :
-          <Button
-            onPress={() => startEvent()}
-            title="Start"
-//             disabled={buttonsDisabled}
-          />}
-
-        <Text>{startTime ? new Date(startTime).toLocaleString() : ''}</Text>
-        <Text>{resultsContent}</Text>
-        <Button
-                      onPress={() => {
-                          resetSession();
-                      }}
-                      title="Reset"
-                     />
-        <Button
-                      onPress={() => {
-                          finishRace();
-                      }}
-                      title="Finish"
-                     />
-        </View>
-  );
+			<Text>{startTime ? new Date(startTime).toLocaleString() : ''}</Text>
+			<Text>{resultsContent}</Text>
+			<Button
+				onPress={() => {
+					resetSession();
+				}}
+				title="Reset"
+				// 				disabled={displayButtons} reenable when finish is handled better
+			/>
+			<Button
+				onPress={() => {
+					finishRace();
+				}}
+				disabled={!displayButtons}
+				title="Finish"
+			/>
+		</View>
+	);
 };
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
 
 export default Timing;
