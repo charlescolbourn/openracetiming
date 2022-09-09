@@ -25,7 +25,7 @@ v1.4.0 - Observer/results mode. (Possible sls framework API to record times)
 
 ## Use Cases
 
-Single device, start race, record times (nfc or manual)
+Single device, start race, record times (nfc only)
 
 Multiple device: A starts race and records times; B records tags/race numbers
 
@@ -40,3 +40,12 @@ Recording start(s)
 Recording finishes
 
 Recording checkpoints
+
+
+## Ideas, sensible or wacky
+
+Push/pull times list from timer device to identity device to perform tallying via local networking
+instead of online service. 
+
+Link to camera taking photos of finishers to audit finish (trigger camera on phone? external nfc reader?)
+

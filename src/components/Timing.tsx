@@ -8,11 +8,12 @@ import { Text, View, Button, Alert } from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Timing = () => {
+const Timing = ({ navigation }) => {
 	const [showStarted, setShowStarted] = React.useState(false);
 	const [startTime, setStartTime] = React.useState(0);
 	const [resultsContent, setResultsContent] = React.useState('');
 	const [displayButtons, setDisplayButtons] = React.useState(false);
+	const [finished, setFinished] = React.useState(false);
 
 	const initialiseFromLocalStorage = () => {
 		//need to handle case where race is finished
@@ -20,8 +21,10 @@ const Timing = () => {
 			.then((timestamp: string | null) => {
 				if (timestamp) {
 					setStartTime(parseInt(timestamp));
-					setShowStarted(true);
-					setDisplayButtons(true);
+					if (!finished) {
+						setShowStarted(true);
+						setDisplayButtons(true);
+					}
 				}
 			})
 			.catch((e) => Alert.alert(JSON.stringify(e)));
@@ -41,27 +44,27 @@ const Timing = () => {
 		return AsyncStorage.setItem(`@ORT_finishtimes:${id}`, `${timestamp}`);
 	};
 
-	const displayResultsFromLocalContent = () => {
-		AsyncStorage.getAllKeys().then((arrayOfKeys) => {
-			arrayOfKeys.forEach((key) => {
-				if (key.startsWith('@ORT_finishtimes')) {
-					const id = key.substring(17, key.length);
-					AsyncStorage.getItem(key)
-						.then((item) => {
-							if (!item) {
-								throw 'Stored finish time is null';
-							}
-							const elapsed = new Date(item);
-							const timeString = `${elapsed.getHours()}:${elapsed.getMinutes()}:${elapsed.getSeconds()}`;
-							setResultsContent(
-								resultsContent + '\n' + id + ' - ' + timeString
-							);
-						})
-						.catch((e) => Alert.alert(JSON.stringify(e)));
-				}
-			});
-		});
-	};
+	// 	const displayResultsFromLocalContent = () => {
+	// 		AsyncStorage.getAllKeys().then((arrayOfKeys) => {
+	// 			arrayOfKeys.forEach((key) => {
+	// 				if (key.startsWith('@ORT_finishtimes')) {
+	// 					const id = key.substring(17, key.length);
+	// 					AsyncStorage.getItem(key)
+	// 						.then((item) => {
+	// 							if (!item) {
+	// 								throw 'Stored finish time is null';
+	// 							}
+	// 							const elapsed = new Date(item);
+	// 							const timeString = `${elapsed.getHours()}:${elapsed.getMinutes()}:${elapsed.getSeconds()}`;
+	// 							setResultsContent(
+	// 								resultsContent + '\n' + id + ' - ' + timeString
+	// 							);
+	// 						})
+	// 						.catch((e) => Alert.alert(JSON.stringify(e)));
+	// 				}
+	// 			});
+	// 		});
+	// 	};
 
 	const writeTime = (entrantId: string = 'unknown') => {
 		const timeNow = Date.now();
@@ -94,13 +97,15 @@ const Timing = () => {
 
 	const finishRace = () => {
 		setShowStarted(false);
-		setStartTime(0);
-		setStartTimeLocalStorage(0);
 		NfcManager.cancelTechnologyRequest().catch((e) =>
 			Alert.alert(JSON.stringify(e))
 		);
-		displayResultsFromLocalContent();
+		//displayResultsFromLocalContent();
+
 		setDisplayButtons(false);
+		setFinished(true);
+		setShowStarted(false);
+		navigation.jumpTo('Identify');
 	};
 
 	const resetSession = () => {
