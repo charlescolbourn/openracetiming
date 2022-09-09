@@ -49,3 +49,5 @@ instead of online service.
 
 Link to camera taking photos of finishers to audit finish (trigger camera on phone? external nfc reader?)
 
+EoD - someone taking details and pushing to the API
+
