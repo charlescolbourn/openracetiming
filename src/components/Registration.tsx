@@ -1,74 +1,78 @@
 import * as React from 'react';
-import { View, Text, Button, SafeAreaView, FlatList } from 'react-native';
+import {
+  View,
+  Text,
+  Button,
+  SafeAreaView,
+  TouchableOpacity,
+} from 'react-native';
 import Dialog from 'react-native-dialog';
-import RNFS from 'react-native-fs';
+// import RNFS from 'react-native-fs';
+import { DownloadDirectoryPath, readDir, readFile } from 'react-native-fs';
 
 const Registration = () => {
-	const [showFileDialog, setShowFileDialog] = React.useState(false);
+  const [showFileDialog, setShowFileDialog] = React.useState(false);
 
-	const [files, setFiles] = React.useState([]);
+  const [files, setFiles] = React.useState([]);
 
-	const getFileContent = async (path) => {
-		const reader = await RNFS.readDir(path);
-		setFiles(reader);
-	};
-	React.useEffect(() => {
-		getFileContent(RNFS.DownloadDirectoryPath); //run the function on the first render.
-	}, []);
+  const [fileData, setFileData] = React.useState('');
 
-	// const Item = ({ name, isFile }) => {
-	const Item = ({ name }) => {
-		return (
-			<View>
-				<Text>{name}</Text>
-				{/*         <Text> {isFile ? "It is a file" : "It's a folder"}</Text> */}
-			</View>
-		);
-	};
-	const renderItem = ({ item }) => {
-		//   const renderItem = ({ item, index }) => {
-		return (
-			<View>
-				{/*         <Text >{index}</Text> */}
-				{/* The isFile method indicates whether the scanned content is a file or a folder*/}
-				<Item name={item.name} isFile={item.isFile()} />
-			</View>
-		);
-	};
+  const getDirContent = async (path) => {
+    // 		const reader = RNFS.readDir(path).then( (result) => {
+    // 		    return Promise.all([RNFS.stat(result[0].path), result[0].path]);
+    // 		    }).then( (fileList) => {
+    // 		        setFileData(JSON.stringify(fileList));
+    //
+    //
+    // 		}).catch( (e) => Alert.alert(e.message));
+    const reader = await readDir(path);
+    //  		setFileData(JSON.stringify(reader));
+    setFiles(reader);
+  };
 
-	return (
-		<View>
-			<Text>
-				'registration'
-				<Button
-					title="Import csv"
-					onPress={() => {
-						setShowFileDialog(true);
-					}}
-				/>
-				<Dialog.Container visible={showFileDialog}>
-					<Dialog.Title>import file</Dialog.Title>
-					<Dialog.Description>
-						<SafeAreaView>
-							<FlatList
-								data={files}
-								renderItem={renderItem}
-								keyExtractor={(item) => item.name}
-							/>
-						</SafeAreaView>
-					</Dialog.Description>
-					<Dialog.Button
-						label="Cancel"
-						onPress={() => {
-							setShowFileDialog(false);
-						}}
-					/>
-					<Dialog.Button label="OK" />
-				</Dialog.Container>
-				scan tag identify person (doesn't exist? add)
-			</Text>
-		</View>
-	);
+  const readFileContent = async (filename) => {
+    const response = await readFile(DownloadDirectoryPath + '/' + filename);
+    setFileData(response); //set the value of response to the fileData Hook.
+  };
+
+  return (
+    <View>
+      <Text>
+        <Button
+          title="Import csv"
+          onPress={() => {
+            getDirContent(DownloadDirectoryPath);
+            setShowFileDialog(true);
+          }}
+        />
+        <Dialog.Container visible={showFileDialog}>
+          <Dialog.Title>import file</Dialog.Title>
+          <Dialog.Description>
+            <SafeAreaView>
+              {files.map(({ name }) => (
+                <TouchableOpacity
+                  key={name}
+                  onPress={() => {
+                    setShowFileDialog(false);
+                    readFileContent(name);
+                  }}
+                >
+                  <Text>{name}</Text>
+                </TouchableOpacity>
+              ))}
+            </SafeAreaView>
+          </Dialog.Description>
+          <Dialog.Button
+            label="Cancel"
+            onPress={() => {
+              setShowFileDialog(false);
+            }}
+          />
+        </Dialog.Container>
+      </Text>
+      <Text>{fileData}</Text>
+    </View>
+  );
 };
 
 export default Registration;
