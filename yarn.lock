@@ -6555,6 +6555,13 @@
   "resolved" "https://registry.npmjs.org/react-native-dialog/-/react-native-dialog-9.2.2.tgz"
   "version" "9.2.2"
 
+"react-native-document-picker@^8.1.1":
+  "integrity" "sha512-mH0oghd7ndgU9/1meVJdqts1sAkOfUQW1qbrqTTsvR5f2K9r0BAj/X02dve5IBMOMZvlGd7qWrNVuIFg5AUXWg=="
+  "resolved" "https://registry.npmjs.org/react-native-document-picker/-/react-native-document-picker-8.1.1.tgz"
+  "version" "8.1.1"
+  dependencies:
+    "invariant" "^2.2.4"
+
 "react-native-fs@^2.20.0":
   "integrity" "sha512-VkTBzs7fIDUiy/XajOSNk0XazFE9l+QlMAce7lGuebZcag5CnjszB+u4BdqzwaQOdcYb5wsJIsqq4kxInIRpJQ=="
   "resolved" "https://registry.npmjs.org/react-native-fs/-/react-native-fs-2.20.0.tgz"
