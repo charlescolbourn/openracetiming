@@ -38,6 +38,7 @@ const Registration = () => {
       <Text>
         <Button
           title="Import csv"
+          color="#e69138ff"
           onPress={async () => {
             try {
               const response = await DocumentPicker.pick({
