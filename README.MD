@@ -51,3 +51,19 @@ Link to camera taking photos of finishers to audit finish (trigger camera on pho
 
 EoD - someone taking details and pushing to the API
 
+## APIs to implement
+
+Upload times
+
+Upload finishers
+
+Upload results
+
+Get times
+
+Get finishers
+
+Get results
+
+Upload entries
+
