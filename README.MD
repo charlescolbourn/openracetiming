@@ -51,6 +51,8 @@ Link to camera taking photos of finishers to audit finish (trigger camera on pho
 
 EoD - someone taking details and pushing to the API
 
+Drop downs for category & club
+
 ## APIs to implement
 
 Upload times
