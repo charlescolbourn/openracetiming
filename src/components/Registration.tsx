@@ -6,13 +6,11 @@ import { readString } from 'react-native-csv';
 
 const Registration = () => {
   const [parsedData, setParsedData] = React.useState([]);
-  const [firstname, setFirstname] = React.useState('');
-  const [lastname, setLastname] = React.useState('');
-  const [club, setClub] = React.useState('');
-  const [category, setCategory] = React.useState('');
+  const [entryData, setEntryData] = React.useState([]);
   const [addOrEdit, setAddOrEdit] = React.useState(false);
   const [displaySaveButton, setDisplaySaveButton] = React.useState(false);
   const [statusMessage, setStatusMessage] = React.useState('');
+  const defaultEntryFields = ['Firstname', 'Lastname', 'Club', 'Category'];
 
   const parseCSV = (data) => {
     const results = readString(data, { header: true });
@@ -30,10 +28,7 @@ const Registration = () => {
   };
 
   const selectRecord = (record) => {
-    setFirstname(record.Forename);
-    setLastname(record.Surname);
-    setClub(record.Club);
-    setCategory(record.Category);
+    setEntryData(record);
     setAddOrEdit(true);
     setDisplaySaveButton(true);
   };
@@ -57,6 +52,10 @@ const Registration = () => {
     );
   };
 
+  const entryForm = (key, value) => {
+    return <TextInput key={key} placeholder={key} value={value} />;
+  };
+
   return (
     <View>
       <View>
@@ -71,6 +70,7 @@ const Registration = () => {
                 });
                 const file = await fetch(response[0].uri);
                 const data = await file.text(); //JSON.stringify(file);
+
                 setParsedData(parseCSV(data));
               } catch (e) {
                 setStatusMessage('ERROR:' + e.message);
@@ -78,49 +78,47 @@ const Registration = () => {
             }}
           />
         </Text>
-        <View>
-          <DataTable>
-            {parsedData.length > 0
-              ? headerLine(Object.keys(parsedData[0]))
-              : ''}
-            {parsedData.length > 0
-              ? parsedData.map((record) => rowsLine(record))
-              : ''}
-          </DataTable>
-        </View>
-        {addOrEdit ? (
-          <View backgroundColor="#AAAAAAAA">
-            <Text>Firstname: </Text>
-            <TextInput placeholder="Firstname" value={firstname} />
-            <Text>Lastname: </Text>
-            <TextInput placeholder="Lastname" value={lastname} />
-            <Text>Club: </Text>
-            <TextInput placeholder="Club" value={club} />
-            <Text>Category: </Text>
-            <TextInput placeholder="Category" value={category} />
-          </View>
-        ) : (
-          ''
-        )}
       </View>
+      <View>
+        <DataTable>
+          {parsedData.length > 0 ? headerLine(Object.keys(parsedData[0])) : ''}
+          {parsedData.length > 0
+            ? parsedData.map((record) => rowsLine(record))
+            : ''}
+        </DataTable>
+      </View>
+      {addOrEdit ? (
+        <View backgroundColor="#AAAAAAAA">
+          {Object.keys(entryData).length > 0
+            ? Object.keys(entryData).map((key) =>
+                entryForm(key, entryData[key])
+              )
+            : ''}
+        </View>
+      ) : (
+        ''
+      )}
+
       <View>
         <Text>
           {!displaySaveButton ? (
             <Button
               title="Add entry"
               color="#e69138ff"
-              onPress={async () => {
+              onPress={() => {
                 setAddOrEdit(true);
-                setCategory('');
-                setFirstname('');
-                setLastname('');
-                setClub('');
+                const entryObject = defaultEntryFields.reduce(
+                  (o, key) => Object.assign(o, { [key]: '' }),
+                  {}
+                );
+                setEntryData(entryObject);
                 setDisplaySaveButton(true);
               }}
             />
           ) : (
             ''
           )}
+
           {displaySaveButton ? (
             <Button title="Save" color="#e69138ff" onPress={async () => {}} />
           ) : (
@@ -132,10 +130,7 @@ const Registration = () => {
               color="#e69138ff"
               onPress={async () => {
                 setAddOrEdit(false);
-                setCategory('');
-                setFirstname('');
-                setLastname('');
-                setClub('');
+                setEntryData([]);
                 setDisplaySaveButton(false);
               }}
             />
