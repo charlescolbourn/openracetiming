@@ -23,6 +23,18 @@ v1.3.0 - Mass start, multi device NFC checkpoints and finish
 
 v1.4.0 - Observer/results mode. (Possible sls framework API to record times)
 
+## Next Steps
+
+register chip and race number against entry
+
+record time for entry
+
+Export times to csv
+
+That's the simplest useable case (entries can be set up with csv)
+
+
+
 ## Use Cases
 
 Single device, start race, record times (nfc only)
