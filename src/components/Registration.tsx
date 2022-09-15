@@ -11,6 +11,7 @@ const Registration = () => {
   const [displaySaveButton, setDisplaySaveButton] = React.useState(false);
   const [statusMessage, setStatusMessage] = React.useState('');
   const defaultEntryFields = ['Firstname', 'Lastname', 'Club', 'Category'];
+  const [raceNumber, setRaceNumber] = React.useState('');
 
   const parseCSV = (data) => {
     const results = readString(data, { header: true });
@@ -52,8 +53,20 @@ const Registration = () => {
     );
   };
 
+  const updateTextField = (key, text) => {
+    setEntryData({ ...entryData, key: entryData[key] + text });
+  };
+
   const entryForm = (key, value) => {
-    return <TextInput key={key} placeholder={key} value={value} />;
+    return (
+      <TextInput
+        key={key}
+        editable={false}
+        placeholder={key}
+        value={value}
+        onChangeText={(changedText) => updateTextField(key, changedText)}
+      />
+    );
   };
 
   return (
@@ -94,6 +107,12 @@ const Registration = () => {
                 entryForm(key, entryData[key])
               )
             : ''}
+          <TextInput
+            placeholder="Race number"
+            value={raceNumber}
+            onChangeText={setRaceNumber}
+          />
+          <Text>Electronic timing chip not yet registered</Text>
         </View>
       ) : (
         ''
@@ -105,6 +124,7 @@ const Registration = () => {
             <Button
               title="Add entry"
               color="#e69138ff"
+              disabled={true}
               onPress={() => {
                 setAddOrEdit(true);
                 const entryObject = defaultEntryFields.reduce(
@@ -119,15 +139,21 @@ const Registration = () => {
             ''
           )}
 
-          {displaySaveButton ? (
-            <Button title="Save" color="#e69138ff" onPress={async () => {}} />
+          {displaySaveButton && false ? (
+            <Button
+              title="Save"
+              disabled={true}
+              color="#e69138ff"
+              onPress={async () => {}}
+            />
           ) : (
             ''
           )}
-          {displaySaveButton ? (
+          {displaySaveButton && false ? (
             <Button
               title="Cancel"
               color="#e69138ff"
+              disabled={true}
               onPress={async () => {
                 setAddOrEdit(false);
                 setEntryData([]);
