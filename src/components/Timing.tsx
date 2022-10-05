@@ -69,18 +69,25 @@ const Timing = ({ navigation }) => {
   const writeTime = (entrantId: string = 'unknown') => {
     const timeNow = Date.now();
     const elapsed = new Date(timeNow - startTime);
-    const entrant = getEntrantFromLocalStorage(entrantId);
-    Alert.alert(entrant);
+
     writeFinishTimeLocalStorage(elapsed.getTime(), entrantId)
       .then(() => {
-        const timeString = `${elapsed.getHours()}:${elapsed.getMinutes()}:${elapsed.getSeconds()}`;
-        setResultsContent(`${resultsContent}\n${entrantId} - ${timeString}`);
+        getEntrantFromLocalStorage(entrantId)
+          .then((entrant) => {
+            const entrantObj = JSON.parse(entrant);
+            const timeString = `${elapsed.getHours()}:${elapsed.getMinutes()}:${elapsed.getSeconds()}`;
+            setResultsContent(
+              `${resultsContent}\n${entrantObj.Surname} - ${timeString}`
+            );
+          })
+          .catch((e) => setResultsContent(JSON.stringify(e.message)));
       })
+
       .catch((e) => Alert.alert(JSON.stringify(e)));
   };
 
   const getEntrantFromLocalStorage = (entrantId) => {
-    return await AsyncStorage.getItem(`@ORT_registeredEntrants:${entrantId}`);
+    return AsyncStorage.getItem(`@ORT_registeredEntrants:${entrantId}`);
   };
 
   React.useEffect(() => {
