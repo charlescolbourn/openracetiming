@@ -11,6 +11,8 @@ import DocumentPicker from 'react-native-document-picker';
 import { DataTable } from 'react-native-paper';
 import { readString } from 'react-native-csv';
 import NfcManager, { NfcEvents } from 'react-native-nfc-manager';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import EntrantRecordLine from './EntrantRecordLine';
 
 const Registration = () => {
   const [parsedData, setParsedData] = React.useState([]);
@@ -21,7 +23,7 @@ const Registration = () => {
   const [displaySaveButton, setDisplaySaveButton] = React.useState(false);
   const [statusMessage, setStatusMessage] = React.useState('');
   const defaultEntryFields = ['Firstname', 'Lastname', 'Club', 'Category'];
-  const [raceNumber, setRaceNumber] = React.useState('');
+  //   const [raceNumber, setRaceNumber] = React.useState('');
   const [nfcRegistered, setNfcRegistered] = React.useState(false);
 
   const parseCSV = (data) => {
@@ -52,24 +54,16 @@ const Registration = () => {
     return obj[Object.keys(obj)[0]] + obj[Object.keys(obj)[1]];
   };
 
-  const rowsLine = (index, record) => {
+  const rowsLine = (index, entrantRecord) => {
     return (
       <TouchableOpacity
-        key={keyFromObject(record)}
+        key={keyFromObject(entrantRecord)}
         onPress={() => {
           setCurrentlySelectedIndex(index);
-          selectRecord(record);
+          selectRecord(entrantRecord);
         }}
       >
-        <DataTable.Row key={keyFromObject(record)}>
-          {Object.values(record).map((field) => {
-            return <DataTable.Cell key={field}>{field}</DataTable.Cell>;
-          })}
-          {/*           <DataTable.Cell key='registeredNumber'></DataTable.Cell> */}
-          <DataTable.Cell key="registeredNfc">
-            {record.nfcId ? 'Yes' : 'No'}
-          </DataTable.Cell>
-        </DataTable.Row>
+        <EntrantRecordLine record={entrantRecord} />
       </TouchableOpacity>
     );
   };
@@ -103,7 +97,15 @@ const Registration = () => {
     setParsedData(copyParsedData);
     //         Alert.alert(JSON.stringify(parsedData[currentlySelectedIndex]));
     setNfcRegistered(true);
-    //TODO this is a really shitty way of implementing this functionality - too big a refresh
+    //TODO this is a really shitty way of implementing this functionality - too big a refresh?
+    addToStarterList(parsedData[currentlySelectedIndex]);
+  };
+
+  const addToStarterList = (record) => {
+    return AsyncStorage.setItem(
+      `@ORT_registeredEntrants:${record.nfcId}`,
+      JSON.stringify(record)
+    );
   };
 
   React.useEffect(() => {
@@ -153,11 +155,11 @@ const Registration = () => {
                 entryForm(key, entryData[key])
               )
             : ''}
-          <TextInput
+          {/*<TextInput
             placeholder="Race number"
             value={raceNumber}
             onChangeText={setRaceNumber}
-          />
+          />*/}
           <Text>
             {nfcRegistered
               ? entryData.nfcId
