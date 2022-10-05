@@ -69,13 +69,18 @@ const Timing = ({ navigation }) => {
   const writeTime = (entrantId: string = 'unknown') => {
     const timeNow = Date.now();
     const elapsed = new Date(timeNow - startTime);
-    // 		const entrant = getEntrantFromLocalStorage(entrantId);
+    const entrant = getEntrantFromLocalStorage(entrantId);
+    Alert.alert(entrant);
     writeFinishTimeLocalStorage(elapsed.getTime(), entrantId)
       .then(() => {
         const timeString = `${elapsed.getHours()}:${elapsed.getMinutes()}:${elapsed.getSeconds()}`;
         setResultsContent(`${resultsContent}\n${entrantId} - ${timeString}`);
       })
       .catch((e) => Alert.alert(JSON.stringify(e)));
+  };
+
+  const getEntrantFromLocalStorage = (entrantId) => {
+    return await AsyncStorage.getItem(`@ORT_registeredEntrants:${entrantId}`);
   };
 
   React.useEffect(() => {
