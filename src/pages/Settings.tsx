@@ -58,6 +58,24 @@ const Settings = () => {
             updateTextField('racename', changedText)
           }
         />
+
+        <TextInput
+          //         key={key}
+          //         editable={false}
+          placeholder="Race Date"
+          onChangeText={(changedText) =>
+            updateTextField('racedate', changedText)
+          }
+        />
+
+        <TextInput
+          //         key={key}
+          //         editable={false}
+          placeholder="Mass start"
+          onChangeText={(changedText) =>
+            updateTextField('massstart', changedText)
+          }
+        />
       </View>
     </>
   );
