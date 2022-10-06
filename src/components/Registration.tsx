@@ -1,20 +1,33 @@
 import * as React from 'react';
-import { View, Text, Button, TextInput, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  Button,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
 import { DataTable } from 'react-native-paper';
 import { readString } from 'react-native-csv';
+import NfcManager, { NfcEvents } from 'react-native-nfc-manager';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import EntrantRecordLine from './EntrantRecordLine';
 
 const Registration = () => {
   const [parsedData, setParsedData] = React.useState([]);
+  //   const [allEntriesData, setAllEntriesData] = React.useState([]);
   const [entryData, setEntryData] = React.useState([]);
+  const [currentlySelectedIndex, setCurrentlySelectedIndex] = React.useState(0);
   const [addOrEdit, setAddOrEdit] = React.useState(false);
   const [displaySaveButton, setDisplaySaveButton] = React.useState(false);
   const [statusMessage, setStatusMessage] = React.useState('');
   const defaultEntryFields = ['Firstname', 'Lastname', 'Club', 'Category'];
-  const [raceNumber, setRaceNumber] = React.useState('');
+  //   const [raceNumber, setRaceNumber] = React.useState('');
+  const [nfcRegistered, setNfcRegistered] = React.useState(false);
 
   const parseCSV = (data) => {
-    const results = readString(data, { header: true });
+    const results = readString(data, { header: true, skipEmptyLines: true });
     return results.data; //handle errors
   };
 
@@ -24,11 +37,14 @@ const Registration = () => {
         {keys.map((field) => {
           return <DataTable.Title key={field}>{field}</DataTable.Title>;
         })}
+        {/*         <DataTable.Title key='rn'>Race Number</DataTable.Title> */}
+        {/*<DataTable.Title key="tag">Registered eTag</DataTable.Title>*/}
       </DataTable.Header>
     );
   };
 
   const selectRecord = (record) => {
+    setNfcRegistered(record.nfcId);
     setEntryData(record);
     setAddOrEdit(true);
     setDisplaySaveButton(true);
@@ -38,17 +54,16 @@ const Registration = () => {
     return obj[Object.keys(obj)[0]] + obj[Object.keys(obj)[1]];
   };
 
-  const rowsLine = (record) => {
+  const rowsLine = (index, entrantRecord) => {
     return (
       <TouchableOpacity
-        key={keyFromObject(record)}
-        onPress={() => selectRecord(record)}
+        key={keyFromObject(entrantRecord)}
+        onPress={() => {
+          setCurrentlySelectedIndex(index);
+          selectRecord(entrantRecord);
+        }}
       >
-        <DataTable.Row key={keyFromObject(record)}>
-          {Object.values(record).map((field) => {
-            return <DataTable.Cell key={field}>{field}</DataTable.Cell>;
-          })}
-        </DataTable.Row>
+        <EntrantRecordLine record={entrantRecord} />
       </TouchableOpacity>
     );
   };
@@ -68,6 +83,39 @@ const Registration = () => {
       />
     );
   };
+
+  React.useEffect(() => {
+    const initNfc = async () => {
+      await NfcManager.registerTagEvent();
+    };
+    initNfc().catch((e) => Alert.alert(JSON.stringify(e)));
+  });
+
+  const registerId = (nfcId: string) => {
+    let copyParsedData = parsedData;
+    copyParsedData[currentlySelectedIndex].nfcId = nfcId;
+    setParsedData(copyParsedData);
+    //         Alert.alert(JSON.stringify(parsedData[currentlySelectedIndex]));
+    setNfcRegistered(true);
+    //TODO this is a really shitty way of implementing this functionality - too big a refresh?
+    addToStarterList(parsedData[currentlySelectedIndex]);
+  };
+
+  const addToStarterList = (record) => {
+    return AsyncStorage.setItem(
+      `@ORT_registeredEntrants:${record.nfcId}`,
+      JSON.stringify(record)
+    );
+  };
+
+  React.useEffect(() => {
+    NfcManager.setEventListener(NfcEvents.DiscoverTag, (tag: any) => {
+      if (addOrEdit) {
+        registerId(tag.id);
+      } else {
+      }
+    });
+  });
 
   return (
     <View>
@@ -96,7 +144,7 @@ const Registration = () => {
         <DataTable>
           {parsedData.length > 0 ? headerLine(Object.keys(parsedData[0])) : ''}
           {parsedData.length > 0
-            ? parsedData.map((record) => rowsLine(record))
+            ? parsedData.map((record, index) => rowsLine(index, record))
             : ''}
         </DataTable>
       </View>
@@ -107,12 +155,16 @@ const Registration = () => {
                 entryForm(key, entryData[key])
               )
             : ''}
-          <TextInput
+          {/*<TextInput
             placeholder="Race number"
             value={raceNumber}
             onChangeText={setRaceNumber}
-          />
-          <Text>Electronic timing chip not yet registered</Text>
+          />*/}
+          <Text>
+            {nfcRegistered
+              ? entryData.nfcId
+              : 'Electronic timing chip not yet registered'}
+          </Text>
         </View>
       ) : (
         ''
