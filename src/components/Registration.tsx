@@ -38,7 +38,7 @@ const Registration = () => {
           return <DataTable.Title key={field}>{field}</DataTable.Title>;
         })}
         {/*         <DataTable.Title key='rn'>Race Number</DataTable.Title> */}
-        <DataTable.Title key="tag">Registered eTag</DataTable.Title>
+        {/*<DataTable.Title key="tag">Registered eTag</DataTable.Title>*/}
       </DataTable.Header>
     );
   };

@@ -137,7 +137,8 @@ const Timing = ({ navigation }) => {
 
   const resetSession = () => {
     setShowStarted(false);
-    setResultsContent('');
+    //     setResultsContent('');
+    setFinishrows([]);
     setStartTime(0);
     AsyncStorage.clear();
     NfcManager.cancelTechnologyRequest().catch((e) =>
@@ -167,6 +168,7 @@ const Timing = ({ navigation }) => {
             writeTime();
           }}
           title="Record a finish"
+          disabled={showStarted}
         />
       ) : (
         <Button onPress={() => startEvent()} title="Start" />
