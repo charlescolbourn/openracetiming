@@ -4,20 +4,26 @@ type EntrantLineProps = {
   record: object;
 };
 
-const EntrantRecordLine: FC<EntrantLineProps> = ({ record }) => {
+const EntrantRecordLine: FC<EntrantLineProps> = ({
+  record,
+  fieldsToDisplay = false,
+}) => {
   const keyFromObject = (obj) => {
     return obj[Object.keys(obj)[0]] + obj[Object.keys(obj)[1]];
   };
 
   return (
     <DataTable.Row key={keyFromObject(record)}>
-      {Object.values(record).map((field) => {
-        return <DataTable.Cell key={field}>{field}</DataTable.Cell>;
-      })}
+      {Object.keys(record)
+        .filter(
+          (key) => fieldsToDisplay == false || fieldsToDisplay.includes(key)
+        )
+        .map((key) => {
+          return (
+            <DataTable.Cell key={record[key]}>{record[key]}</DataTable.Cell>
+          );
+        })}
       {/*           <DataTable.Cell key='registeredNumber'></DataTable.Cell> */}
-      <DataTable.Cell key="registeredNfc">
-        {record.nfcId ? 'Yes' : 'No'}
-      </DataTable.Cell>
     </DataTable.Row>
   );
 };

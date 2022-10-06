@@ -84,12 +84,15 @@ const Timing = ({ navigation }) => {
             entrantObj.finishtime = timeString;
             const newFinishrows = [
               ...finishrows,
-              <EntrantRecordLine record={entrantObj} />,
+              <EntrantRecordLine
+                record={entrantObj}
+                fieldsToDisplay={[
+                  ...Object.keys(entrantObj).slice(0, 2),
+                  'finishtime',
+                ]}
+              />,
             ];
             setFinishrows(newFinishrows);
-            //             setResultsContent(
-            //               `${resultsContent}\n${entrantObj.Surname} - ${timeString}`
-            //             );
           })
           .catch((e) => setResultsContent(JSON.stringify(e.message)));
       })
