@@ -53,9 +53,10 @@ const Settings = () => {
         <TextInput
           //         key={key}
           //         editable={false}
-          //         placeholder={key}
-          //         value={value}
-          onChangeText={(changedText) => updateTextField(changedText)}
+          placeholder="Race Name"
+          onChangeText={(changedText) =>
+            updateTextField('racename', changedText)
+          }
         />
       </View>
     </>
