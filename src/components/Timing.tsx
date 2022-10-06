@@ -5,8 +5,11 @@
 import React from 'react';
 import NfcManager, { NfcEvents } from 'react-native-nfc-manager';
 import { Text, View, Button, Alert } from 'react-native';
+import { DataTable } from 'react-native-paper';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import EntrantRecordLine from './EntrantRecordLine';
 
 const Timing = ({ navigation }) => {
   const [showStarted, setShowStarted] = React.useState(false);
@@ -14,6 +17,7 @@ const Timing = ({ navigation }) => {
   const [resultsContent, setResultsContent] = React.useState('');
   const [displayButtons, setDisplayButtons] = React.useState(false);
   const [finished, setFinished] = React.useState(false);
+  const [finishrows, setFinishrows] = React.useState('');
 
   const initialiseFromLocalStorage = () => {
     //need to handle case where race is finished
@@ -74,11 +78,18 @@ const Timing = ({ navigation }) => {
       .then(() => {
         getEntrantFromLocalStorage(entrantId)
           .then((entrant) => {
-            const entrantObj = JSON.parse(entrant);
+            let entrantObj = JSON.parse(entrant);
+
             const timeString = `${elapsed.getHours()}:${elapsed.getMinutes()}:${elapsed.getSeconds()}`;
-            setResultsContent(
-              `${resultsContent}\n${entrantObj.Surname} - ${timeString}`
-            );
+            entrantObj.finishtime = timeString;
+            const newFinishrows = [
+              ...finishrows,
+              <EntrantRecordLine record={entrantObj} />,
+            ];
+            setFinishrows(newFinishrows);
+            //             setResultsContent(
+            //               `${resultsContent}\n${entrantObj.Surname} - ${timeString}`
+            //             );
           })
           .catch((e) => setResultsContent(JSON.stringify(e.message)));
       })
@@ -159,6 +170,9 @@ const Timing = ({ navigation }) => {
       )}
 
       <Text>{startTime ? new Date(startTime).toLocaleString() : ''}</Text>
+      <View>
+        <DataTable>{finishrows}</DataTable>
+      </View>
       <Text>{resultsContent}</Text>
       <Button
         onPress={() => {
