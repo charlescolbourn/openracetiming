@@ -4,14 +4,16 @@
 
 import React from 'react';
 
-import { View, Button, TextInput } from 'react-native';
+import { View, Button, TextInput, Text, TouchableOpacity } from 'react-native';
 import { DataTable } from 'react-native-paper';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Settings = () => {
   const [availableRaces, setAvailableRaces] = React.useState([]);
   const [raceData, setRaceData] = React.useState([]);
+  const [datePickerVisible, setDatePickerVisible] = React.useState(false);
 
   const initialiseFromLocalStorage = () => {
     getRacesFromLocalStorage().then((raceList) => {
@@ -59,13 +61,14 @@ const Settings = () => {
           }
         />
 
-        <TextInput
-          //         key={key}
-          //         editable={false}
-          placeholder="Race Date"
-          onChangeText={(changedText) =>
-            updateTextField('racedate', changedText)
-          }
+        <TouchableOpacity onPress={() => setDatePickerVisible(true)}>
+          <Text>Choose race date</Text>
+        </TouchableOpacity>
+        <DateTimePickerModal
+          isVisible={datePickerVisible}
+          mode="date"
+          onConfirm={() => setDatePickerVisible(false)}
+          onCancel={() => setDatePickerVisible(false)}
         />
 
         <TextInput

@@ -14,31 +14,27 @@ OpenRaceTiming is intended to be a fully open source race timing system with the
 
 ## Roadmap
 
-v1.1.0 - Mass start, NFC scanning or tap recording at finish. Import of entrant spreadsheet/manually
+v1.1.0 - Mass start, NFC scanning at finish. Import of entrant spreadsheet/manually
   add names. Output of results spreadsheet.
 
 v1.2.0 - Mass start, multi device NFC finish
 
-v1.3.0 - Mass start, multi device NFC checkpoints and finish
+v1.3.0 - Mass start, multi device NFC checkpoints and finish, localisation
 
 v1.4.0 - Observer/results mode. (Possible sls framework API to record times)
 
 ## Next Steps
 
-move code into mono repo
-
-refactor local storage stuff into a lib file
+Create settings page & save settings to local
 
 Implement some tests
 
-register chip and race number against entry
 
-record time for entry
-
-Export times to csv
+Export times to csv - put the save dialogue on the 'finish/results' tab
 
 That's the simplest useable case (entries can be set up with csv)
 
+register race number against entry
 
 
 ## Use Cases
