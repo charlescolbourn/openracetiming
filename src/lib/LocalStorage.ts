@@ -20,4 +20,11 @@ export default class LocalStorage {
   public static clear() {
     AsyncStorage.clear();
   }
+
+  public static addToStarterList(record) {
+    return AsyncStorage.setItem(
+      `@ORT_registeredEntrants:${record.nfcId}`,
+      JSON.stringify(record)
+    );
+  }
 }

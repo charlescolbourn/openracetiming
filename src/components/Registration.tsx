@@ -11,7 +11,7 @@ import DocumentPicker from 'react-native-document-picker';
 import { DataTable } from 'react-native-paper';
 import { readString } from 'react-native-csv';
 import NfcManager, { NfcEvents } from 'react-native-nfc-manager';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import LocalStorage from '../lib/LocalStorage';
 import EntrantRecordLine from './EntrantRecordLine';
 
 const Registration = () => {
@@ -98,14 +98,7 @@ const Registration = () => {
     //         Alert.alert(JSON.stringify(parsedData[currentlySelectedIndex]));
     setNfcRegistered(true);
     //TODO this is a really shitty way of implementing this functionality - too big a refresh?
-    addToStarterList(parsedData[currentlySelectedIndex]);
-  };
-
-  const addToStarterList = (record) => {
-    return AsyncStorage.setItem(
-      `@ORT_registeredEntrants:${record.nfcId}`,
-      JSON.stringify(record)
-    );
+    LocalStorage.addToStarterList(parsedData[currentlySelectedIndex]);
   };
 
   React.useEffect(() => {
