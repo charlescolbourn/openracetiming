@@ -6,7 +6,7 @@ import React from 'react';
 import NfcManager, { NfcEvents } from 'react-native-nfc-manager';
 import { Text, View, Button, Alert } from 'react-native';
 import { DataTable } from 'react-native-paper';
-
+import moment from 'moment';
 import LocalStorage from '../lib/LocalStorage';
 
 import EntrantRecordLine from './EntrantRecordLine';
@@ -17,7 +17,7 @@ const Timing = ({ navigation }) => {
   const [resultsContent, setResultsContent] = React.useState('');
   const [displayButtons, setDisplayButtons] = React.useState(false);
   const [finished, setFinished] = React.useState(false);
-  const [finishrows, setFinishrows] = React.useState('');
+  const [finishrows, setFinishrows] = React.useState([]);
 
   const initialiseFromLocalStorage = () => {
     //need to handle case where race is finished
@@ -36,15 +36,15 @@ const Timing = ({ navigation }) => {
 
   const writeTime = (entrantId: string = 'unknown') => {
     const timeNow = Date.now();
-    const elapsed = new Date(timeNow - startTime);
+    const elapsed = timeNow - startTime;
 
-    LocalStorage.writeFinishTimeLocalStorage(elapsed.getTime(), entrantId)
+    LocalStorage.writeFinishTimeLocalStorage(elapsed, entrantId)
       .then(() => {
         LocalStorage.getEntrantFromLocalStorage(entrantId)
           .then((entrant) => {
             let entrantObj = JSON.parse(entrant);
 
-            const timeString = `${elapsed.getHours()}:${elapsed.getMinutes()}:${elapsed.getSeconds()}`;
+            const timeString = moment(elapsed).format('HH:mm:ss.S');
             entrantObj.finishtime = timeString;
             const newFinishrows = [
               ...finishrows,

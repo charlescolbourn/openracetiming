@@ -3,7 +3,7 @@
  */
 
 import Settings from './pages/Settings';
-// import TimeRace from './pages/TimeRace';
+import TimeRace from './pages/TimeRace';
 
 import * as React from 'react';
 // import {  Image } from 'react-native';
@@ -18,7 +18,12 @@ import * as React from 'react';
 // }
 
 const App = () => {
-  return <Settings />;
+  return (
+    <>
+      <Settings />
+      <TimeRace />
+    </>
+  );
 };
 
 export default App;
