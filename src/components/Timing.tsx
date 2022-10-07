@@ -7,7 +7,7 @@ import NfcManager, { NfcEvents } from 'react-native-nfc-manager';
 import { Text, View, Button, Alert } from 'react-native';
 import { DataTable } from 'react-native-paper';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import LocalStorage from '../lib/LocalStorage';
 
 import EntrantRecordLine from './EntrantRecordLine';
 
@@ -21,7 +21,7 @@ const Timing = ({ navigation }) => {
 
   const initialiseFromLocalStorage = () => {
     //need to handle case where race is finished
-    getStartTimeLocalStorage()
+    LocalStorage.getStartTime()
       .then((timestamp: string | null) => {
         if (timestamp) {
           setStartTime(parseInt(timestamp));
@@ -34,49 +34,13 @@ const Timing = ({ navigation }) => {
       .catch((e) => Alert.alert(JSON.stringify(e)));
   };
 
-  const setStartTimeLocalStorage = (timestamp: number) => {
-    return AsyncStorage.setItem('@ORT_starttimes:default', `${timestamp}`);
-  };
-  //   const removeStartTimeLocalStorage = () => {
-  //     return AsyncStorage.removeItem('@ORT_starttimes:default');
-  //   }
-  const getStartTimeLocalStorage = () => {
-    return AsyncStorage.getItem('@ORT_starttimes:default');
-  };
-
-  const writeFinishTimeLocalStorage = (timestamp: number, id: string) => {
-    return AsyncStorage.setItem(`@ORT_finishtimes:${id}`, `${timestamp}`);
-  };
-
-  // 	const displayResultsFromLocalContent = () => {
-  // 		AsyncStorage.getAllKeys().then((arrayOfKeys) => {
-  // 			arrayOfKeys.forEach((key) => {
-  // 				if (key.startsWith('@ORT_finishtimes')) {
-  // 					const id = key.substring(17, key.length);
-  // 					AsyncStorage.getItem(key)
-  // 						.then((item) => {
-  // 							if (!item) {
-  // 								throw 'Stored finish time is null';
-  // 							}
-  // 							const elapsed = new Date(item);
-  // 							const timeString = `${elapsed.getHours()}:${elapsed.getMinutes()}:${elapsed.getSeconds()}`;
-  // 							setResultsContent(
-  // 								resultsContent + '\n' + id + ' - ' + timeString
-  // 							);
-  // 						})
-  // 						.catch((e) => Alert.alert(JSON.stringify(e)));
-  // 				}
-  // 			});
-  // 		});
-  // 	};
-
   const writeTime = (entrantId: string = 'unknown') => {
     const timeNow = Date.now();
     const elapsed = new Date(timeNow - startTime);
 
-    writeFinishTimeLocalStorage(elapsed.getTime(), entrantId)
+    LocalStorage.writeFinishTimeLocalStorage(elapsed.getTime(), entrantId)
       .then(() => {
-        getEntrantFromLocalStorage(entrantId)
+        LocalStorage.getEntrantFromLocalStorage(entrantId)
           .then((entrant) => {
             let entrantObj = JSON.parse(entrant);
 
@@ -100,10 +64,6 @@ const Timing = ({ navigation }) => {
       .catch((e) => Alert.alert(JSON.stringify(e)));
   };
 
-  const getEntrantFromLocalStorage = (entrantId) => {
-    return AsyncStorage.getItem(`@ORT_registeredEntrants:${entrantId}`);
-  };
-
   React.useEffect(() => {
     NfcManager.setEventListener(NfcEvents.DiscoverTag, (tag: any) => {
       if (showStarted) {
@@ -117,7 +77,7 @@ const Timing = ({ navigation }) => {
   const startEvent = () => {
     const now = Date.now();
     setStartTime(now);
-    setStartTimeLocalStorage(now);
+    LocalStorage.setStartTime(now);
     setShowStarted(true);
     setDisplayButtons(true);
   };
@@ -140,15 +100,11 @@ const Timing = ({ navigation }) => {
     //     setResultsContent('');
     setFinishrows([]);
     setStartTime(0);
-    AsyncStorage.clear();
+    LocalStorage.clear();
     NfcManager.cancelTechnologyRequest().catch((e) =>
       Alert.alert(JSON.stringify(e))
     );
   };
-
-  //   const backgroundStyle = {
-  //     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  //   };
 
   React.useEffect(() => {
     const initNfc = async () => {

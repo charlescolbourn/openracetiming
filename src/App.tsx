@@ -18,10 +18,7 @@ import * as React from 'react';
 // }
 
 const App = () => {
-  return (
-    /* <TimeRace/> */
-    <Settings />
-  );
+  return <Settings />;
 };
 
 export default App;
