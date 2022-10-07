@@ -25,6 +25,12 @@ v1.4.0 - Observer/results mode. (Possible sls framework API to record times)
 
 ## Next Steps
 
+move code into mono repo
+
+refactor local storage stuff into a lib file
+
+Implement some tests
+
 register chip and race number against entry
 
 record time for entry
