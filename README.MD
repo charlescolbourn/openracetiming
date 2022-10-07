@@ -27,6 +27,8 @@ v1.4.0 - Observer/results mode. (Possible sls framework API to record times)
 
 Create settings page & save settings to local
 
+Migrate settings from page to modal that appears on start
+
 Implement some tests
 
 
