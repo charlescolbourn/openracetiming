@@ -37,13 +37,15 @@ const Settings = () => {
         //  : [];
         setAvailableRaces(JSON.stringify(raceList));
       })
-      .catch((e) => setDebug(JSON.stringify(e)));
+      .catch((e) => setDebug(JSON.stringify(e.message)));
   };
 
   React.useEffect(() => initialiseFromLocalStorage());
 
   const saveRace = () => {
     LocalStorage.saveRace(raceData).catch((e) => setDebug(JSON.stringify(e)));
+    setShowNewRaceForm(false);
+    initialiseFromLocalStorage();
   };
 
   const updateField = (key, value) => {
