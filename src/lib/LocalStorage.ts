@@ -30,11 +30,11 @@ export default class LocalStorage {
 
   public static getRaces() {
     return AsyncStorage.getItem('@ORT_allraces').then((raceList) => {
-      return raceList
-        ? AsyncStorage.multiGet(
-            raceList.map((key) => `@ORT_racedetails:${key}`)
-          )
-        : new Promise(() => []);
+      //       return raceList
+      //         ? AsyncStorage.multiGet(
+      return raceList.map((key) => `@ORT_racedetails:${key}`);
+      //           )
+      //         : new Promise(() => []);
     });
   }
 
