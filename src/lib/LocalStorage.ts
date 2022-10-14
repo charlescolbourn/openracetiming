@@ -31,9 +31,10 @@ export default class LocalStorage {
   public static getRaces() {
     return AsyncStorage.getItem('@ORT_allraces').then((raceList) => {
       return raceList
-        ? raceList
-        : //         AsyncStorage.multiGet('@ORT_racedetails:'raceList)
-          new Promise(() => []);
+        ? AsyncStorage.multiGet(
+            raceList.map((key) => `@ORT_racedetails:${key}`)
+          )
+        : new Promise(() => []);
     });
   }
 
@@ -46,10 +47,11 @@ export default class LocalStorage {
       .then(() => {
         AsyncStorage.getItem('@ORT_allraces')
           .then((races) => {
-            races = races ? races : [];
+            let raceArray = races ? JSON.parse(races) : [];
+            raceArray.push(raceKey);
             AsyncStorage.setItem(
               '@ORT_allraces',
-              JSON.stringify([...races, raceKey])
+              JSON.stringify(raceArray)
             ).catch((e) => Alert.alert(e.message));
           })
           .catch((e) => Alert.alert(JSON.stringify(e.message)));

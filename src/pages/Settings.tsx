@@ -35,7 +35,7 @@ const Settings = () => {
         //           console.log(race);
         //         })
         //  : [];
-        setAvailableRaces(raceList);
+        setAvailableRaces(JSON.stringify(raceList));
       })
       .catch((e) => setDebug(JSON.stringify(e)));
   };
