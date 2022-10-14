@@ -12,10 +12,10 @@ import {
   TouchableOpacity,
   Switch,
 } from 'react-native';
-import { DataTable } from 'react-native-paper';
+// import { DataTable } from 'react-native-paper';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import LocalStorage from '../lib/LocalStorage';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 
 const Settings = () => {
@@ -27,30 +27,29 @@ const Settings = () => {
   const [debug, setDebug] = React.useState('');
 
   const initialiseFromLocalStorage = () => {
-    getRacesFromLocalStorage().then((raceList) => {
-      let listTable = raceList
-        .sort((a, b) => a.raceDate < b.raceDate)
-        .map((race) => {
-          console.log(race);
-        });
-      setAvailableRaces(listTable);
-    });
+    LocalStorage.getRaces()
+      .then((raceList) => {
+        //       let listTable = raceList ? raceList
+        //         .sort((a, b) => a.raceDate < b.raceDate)
+        //         .map((race) => {
+        //           console.log(race);
+        //         })
+        //  : [];
+        setAvailableRaces(raceList);
+      })
+      .catch((e) => setDebug(JSON.stringify(e)));
   };
 
   React.useEffect(() => initialiseFromLocalStorage());
 
   const saveRace = () => {
-    setDebug(JSON.stringify(raceData));
+    LocalStorage.saveRace(raceData).catch((e) => setDebug(JSON.stringify(e)));
   };
 
-  const getRacesFromLocalStorage = () => {
-    return AsyncStorage.getItem('@ORT_allraces');
-  };
   const updateField = (key, value) => {
     let newObj = raceData;
     newObj[key] = value;
     setRaceData(newObj);
-    setDebug(JSON.stringify(raceData));
   };
 
   const newRaceForm = () => {
@@ -104,7 +103,7 @@ const Settings = () => {
   return (
     <>
       <View>
-        <DataTable>{availableRaces}</DataTable>
+        <Text>{availableRaces}</Text>
       </View>
 
       {showNewRaceForm ? (
