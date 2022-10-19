@@ -9,11 +9,11 @@ export default class LocalStorage {
     return AsyncStorage.getItem('@ORT_starttimes:default');
   }
 
-  public static writeFinishTimeLocalStorage(timestamp: number, id: string) {
+  public static writeFinishTime(timestamp: number, id: string) {
     return AsyncStorage.setItem(`@ORT_finishtimes:${id}`, `${timestamp}`);
   }
 
-  public static getEntrantFromLocalStorage(entrantId) {
+  public static getEntrant(entrantId) {
     return AsyncStorage.getItem(`@ORT_registeredEntrants:${entrantId}`);
   }
 

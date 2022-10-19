@@ -38,9 +38,9 @@ const Timing = ({ navigation }) => {
     const timeNow = Date.now();
     const elapsed = timeNow - startTime;
 
-    LocalStorage.writeFinishTimeLocalStorage(elapsed, entrantId)
+    LocalStorage.writeFinishTime(elapsed, entrantId)
       .then(() => {
-        LocalStorage.getEntrantFromLocalStorage(entrantId)
+        LocalStorage.getEntrant(entrantId)
           .then((entrant) => {
             let entrantObj = JSON.parse(entrant);
 
