@@ -1,0 +1,19 @@
+import MockAsyncStorage from 'mock-async-storage';
+import LocalStorage from './LocalStorage'
+
+const mock = () => {
+  const mockImpl = new MockAsyncStorage()
+  jest.mock('AsyncStorage', () => mockImpl)
+}
+
+describe('test timing methods',() => {
+    it('check get start time', () => {
+        LocalStorage.getStartTime();
+        expect(AsyncStorage.getItem).toBeCalledWith();
+
+
+    });
+
+
+});
+

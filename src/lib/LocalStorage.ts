@@ -60,4 +60,8 @@ export default class LocalStorage {
       })
       .catch((e) => Alert.alert(JSON.stringify(e.message)));
   }
+
+  public static setCurrentRace(raceInfo) {
+    AsyncStorage.setItem('@ORT_currentrace', JSON.stringify(raceInfo));
+  }
 }

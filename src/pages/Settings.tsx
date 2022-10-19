@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   Switch,
 } from 'react-native';
-// import { DataTable } from 'react-native-paper';
+import { DataTable } from 'react-native-paper';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import LocalStorage from '../lib/LocalStorage';
 
@@ -35,12 +35,29 @@ const Settings = () => {
         //           console.log(race);
         //         })
         //  : [];
-        setAvailableRaces(JSON.stringify(raceList));
+        setAvailableRaces(tabulateRaces(raceList));
       })
       .catch((e) => setDebug(JSON.stringify(e.message)));
   };
 
   React.useEffect(() => initialiseFromLocalStorage());
+
+  const selectRace = (raceInfo) => {
+    LocalStorage.setCurrentRace(raceInfo);
+  };
+
+  const tabulateRaces = (raceList) => {
+    return raceList.map((key) => {
+      return (
+        <TouchableOpacity onPress={selectRace(raceList[key])}>
+          <DataTable.Row key={key}>
+            <DataTable.Cell key="name">{raceList[key].racename}</DataTable.Cell>
+            <DataTable.Cell key="date">{raceList[key].racedate}</DataTable.Cell>
+          </DataTable.Row>
+        </TouchableOpacity>
+      );
+    });
+  };
 
   const saveRace = () => {
     LocalStorage.saveRace(raceData).catch((e) => setDebug(JSON.stringify(e)));
@@ -105,7 +122,7 @@ const Settings = () => {
   return (
     <>
       <View>
-        <Text>{availableRaces}</Text>
+        <DataTable>{availableRaces}</DataTable>
       </View>
 
       {showNewRaceForm ? (

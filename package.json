@@ -20,6 +20,7 @@
     "csv": "^6.2.0",
     "date-fns": "^2.29.3",
     "intl": "^1.2.5",
+    "mock-async-storage": "^2.2.0",
     "moment": "^2.29.4",
     "momentjs": "^2.0.0",
     "numbro": "^2.3.6",
