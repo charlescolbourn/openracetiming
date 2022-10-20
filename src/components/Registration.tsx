@@ -12,6 +12,7 @@ import { DataTable } from 'react-native-paper';
 import { readString } from 'react-native-csv';
 import NfcManager, { NfcEvents } from 'react-native-nfc-manager';
 import LocalStorage from '../lib/LocalStorage';
+import Utils from '../lib/Utils';
 import EntrantRecordLine from './EntrantRecordLine';
 
 const Registration = () => {
@@ -25,6 +26,7 @@ const Registration = () => {
   const defaultEntryFields = ['Firstname', 'Lastname', 'Club', 'Category'];
   //   const [raceNumber, setRaceNumber] = React.useState('');
   const [nfcRegistered, setNfcRegistered] = React.useState(false);
+  const [currentRace, setCurrentRace] = React.useState({});
 
   const parseCSV = (data) => {
     const results = readString(data, { header: true, skipEmptyLines: true });
@@ -89,6 +91,10 @@ const Registration = () => {
       await NfcManager.registerTagEvent();
     };
     initNfc().catch((e) => Alert.alert(JSON.stringify(e)));
+
+  });
+  React.useEffect( () => {
+    LocalStorage.getCurrentRace().then( (raceDetails) => setCurrentRace(JSON.parse(raceDetails)) );
   });
 
   const registerId = (nfcId: string) => {
@@ -98,7 +104,7 @@ const Registration = () => {
     //         Alert.alert(JSON.stringify(parsedData[currentlySelectedIndex]));
     setNfcRegistered(true);
     //TODO this is a really shitty way of implementing this functionality - too big a refresh?
-    LocalStorage.addToStarterList(parsedData[currentlySelectedIndex]);
+    LocalStorage.addToStarterList(Utils.getRaceKey(currentRace),parsedData[currentlySelectedIndex]);
   };
 
   React.useEffect(() => {

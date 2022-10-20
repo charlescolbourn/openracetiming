@@ -8,6 +8,7 @@ import { Text, View, Button, Alert } from 'react-native';
 import { DataTable } from 'react-native-paper';
 import moment from 'moment';
 import LocalStorage from '../lib/LocalStorage';
+import Utils from '../lib/Utils';
 
 import EntrantRecordLine from './EntrantRecordLine';
 
@@ -20,53 +21,66 @@ const Timing = ({ navigation }) => {
   const [finishrows, setFinishrows] = React.useState([]);
   const [currentRace, setCurrentRace] = React.useState([]);
 
+
+
   const initialiseFromLocalStorage = () => {
     //need to handle case where race is finished
-    LocalStorage.getStartTime()
-      .then((timestamp: string | null) => {
-        if (timestamp) {
-          setStartTime(parseInt(timestamp));
-          if (!finished) {
-            setShowStarted(true);
-            setDisplayButtons(true);
-          }
-        }
-      })
-      .catch((e) => Alert.alert(JSON.stringify(e)));
-    LocalStorage.getCurrentRace().then((raceDetails) =>
+    LocalStorage.getCurrentRace().then( (raceDetails) => {
       setCurrentRace(JSON.parse(raceDetails))
-    );
+        LocalStorage.getStartTime(Utils.getRaceKey(raceDetails))
+          .then((timestamp: string | null) => {
+            if (timestamp) {
+              setStartTime(parseInt(timestamp));
+              if (!finished) {
+                setShowStarted(true);
+                setDisplayButtons(true);
+              }
+            }
+          })
+          .catch((e) => Alert.alert(JSON.stringify(e)));
+        });
   };
+
+
+
 
   const writeTime = (entrantId: string = 'unknown') => {
     const timeNow = Date.now();
     const elapsed = timeNow - startTime;
-
-    LocalStorage.writeFinishTime(elapsed, entrantId)
-      .then(() => {
-        LocalStorage.getEntrant(entrantId)
-          .then((entrant) => {
-            let entrantObj = JSON.parse(entrant);
-
-            const timeString = moment(elapsed).format('HH:mm:ss.S');
-            entrantObj.finishtime = timeString;
-            const newFinishrows = [
-              ...finishrows,
-              <EntrantRecordLine
-                record={entrantObj}
-                fieldsToDisplay={[
-                  ...Object.keys(entrantObj).slice(0, 2),
-                  'finishtime',
-                ]}
-              />,
-            ];
-            setFinishrows(newFinishrows);
-          })
-          .catch((e) => setResultsContent(JSON.stringify(e.message)));
-      })
-
-      .catch((e) => Alert.alert(JSON.stringify(e)));
+Alert.alert(entrantId);
+//     LocalStorage.writeFinishTime(Utils.getRaceKey(currentRace),elapsed, entrantId)
+//       .then(() => {
+//         LocalStorage.getEntrant(Utils.getRaceKey(currentRace),entrantId)
+//           .then((entrant) => {
+//             let entrantObj = JSON.parse(entrant);
+//
+//             const timeString = moment(elapsed).format('HH:mm:ss.S');
+//             entrantObj.finishtime = timeString;
+//             const newFinishrows = [
+//               ...finishrows,
+//               <EntrantRecordLine
+//                 record={entrantObj}
+//                 fieldsToDisplay={[
+//                   ...Object.keys(entrantObj).slice(0, 2),
+//                   'finishtime',
+//                 ]}
+//               />,
+//             ];
+//             setFinishrows(newFinishrows);
+//           })
+//           .catch((e) => setResultsContent(JSON.stringify(e.message)));
+//       })
+//
+//       .catch((e) => Alert.alert(JSON.stringify(e)));
   };
+
+
+  React.useEffect(() => {
+    const initNfc = async () => {
+      await NfcManager.registerTagEvent();
+    };
+    initNfc().catch((e) => Alert.alert(JSON.stringify(e)));
+  });
 
   React.useEffect(() => {
     NfcManager.setEventListener(NfcEvents.DiscoverTag, (tag: any) => {
@@ -81,7 +95,7 @@ const Timing = ({ navigation }) => {
   const startEvent = () => {
     const now = Date.now();
     setStartTime(now);
-    LocalStorage.setStartTime(now);
+    LocalStorage.setStartTime(Utils.getRaceKey(currentRace),now);
     setShowStarted(true);
     setDisplayButtons(true);
   };
@@ -110,12 +124,7 @@ const Timing = ({ navigation }) => {
     );
   };
 
-  React.useEffect(() => {
-    const initNfc = async () => {
-      await NfcManager.registerTagEvent();
-    };
-    initNfc().catch((e) => Alert.alert(JSON.stringify(e)));
-  });
+
 
   if (!showStarted) {
     initialiseFromLocalStorage();
@@ -123,8 +132,7 @@ const Timing = ({ navigation }) => {
   return (
     <View>
       <Text>
-        {currentRace.raceName} -{' '}
-        {moment(currentRace.raceDate).format('DD/MM/YYYY')}
+        {currentRace ? `${currentRace.raceName} ${moment(currentRace.raceDate).format('DD/MM/YYYY')}` : ''}
       </Text>
       {showStarted ? (
         <Button

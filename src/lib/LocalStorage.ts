@@ -1,29 +1,29 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
 export default class LocalStorage {
-  public static setStartTime(timestamp: number) {
+  public static setStartTime(racekey: string, timestamp: number) {
     return AsyncStorage.setItem('@ORT_starttimes:default', `${timestamp}`);
   }
 
-  public static getStartTime() {
-    return AsyncStorage.getItem('@ORT_starttimes:default');
+  public static getStartTime(racekey) {
+    return AsyncStorage.getItem(`@ORT_starttimes:${racekey}:default`);
   }
 
-  public static writeFinishTime(timestamp: number, id: string) {
-    return AsyncStorage.setItem(`@ORT_finishtimes:${id}`, `${timestamp}`);
+  public static writeFinishTime(racekey: string, timestamp: number, id: string) {
+    return AsyncStorage.setItem(`@ORT_finishtimes:${racekey}:${id}`, `${timestamp}`);
   }
 
-  public static getEntrant(entrantId) {
-    return AsyncStorage.getItem(`@ORT_registeredEntrants:${entrantId}`);
+  public static getEntrant(racekey: string, entrantId: string) {
+    return AsyncStorage.getItem(`@ORT_registeredEntrants:${racekey}:${entrantId}`);
   }
 
   public static clear() {
     AsyncStorage.clear();
   }
 
-  public static addToStarterList(record) {
+  public static addToStarterList(racekey, record) {
     return AsyncStorage.setItem(
-      `@ORT_registeredEntrants:${record.nfcId}`,
+      `@ORT_registeredEntrants:${racekey}:${record.nfcId}`,
       JSON.stringify(record)
     );
   }
