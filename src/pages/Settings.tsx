@@ -51,7 +51,7 @@ const Settings = () => {
   const tabulateRaces = (raceList) => {
     return raceList.map((value) => {
       return (
-        <TouchableOpacity onPress={selectRace(value)}>
+        <TouchableOpacity onPress={() => selectRace(value)}>
           <DataTable.Row key={value.raceName}>
             <DataTable.Cell key="name">{value.raceName}</DataTable.Cell>
             <DataTable.Cell key="date">

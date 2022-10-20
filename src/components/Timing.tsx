@@ -18,6 +18,7 @@ const Timing = ({ navigation }) => {
   const [displayButtons, setDisplayButtons] = React.useState(false);
   const [finished, setFinished] = React.useState(false);
   const [finishrows, setFinishrows] = React.useState([]);
+  const [currentRace, setCurrentRace] = React.useState([]);
 
   const initialiseFromLocalStorage = () => {
     //need to handle case where race is finished
@@ -32,6 +33,9 @@ const Timing = ({ navigation }) => {
         }
       })
       .catch((e) => Alert.alert(JSON.stringify(e)));
+    LocalStorage.getCurrentRace().then((raceDetails) =>
+      setCurrentRace(JSON.parse(raceDetails))
+    );
   };
 
   const writeTime = (entrantId: string = 'unknown') => {
@@ -118,6 +122,10 @@ const Timing = ({ navigation }) => {
   }
   return (
     <View>
+      <Text>
+        {currentRace.raceName} -{' '}
+        {moment(currentRace.raceDate).format('DD/MM/YYYY')}
+      </Text>
       {showStarted ? (
         <Button
           onPress={() => {

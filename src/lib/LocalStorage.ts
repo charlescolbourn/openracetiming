@@ -66,4 +66,8 @@ export default class LocalStorage {
   public static setCurrentRace(raceInfo) {
     AsyncStorage.setItem('@ORT_currentrace', JSON.stringify(raceInfo));
   }
+
+  public static getCurrentRace() {
+    return AsyncStorage.getItem('@ORT_currentrace');
+  }
 }
