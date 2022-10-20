@@ -83,6 +83,10 @@ Alert.alert(entrantId);
   });
 
   React.useEffect(() => {
+
+  if (!showStarted) {
+    initialiseFromLocalStorage();
+  }
     NfcManager.setEventListener(NfcEvents.DiscoverTag, (tag: any) => {
       if (showStarted) {
         writeTime(tag.id);
@@ -126,9 +130,6 @@ Alert.alert(entrantId);
 
 
 
-  if (!showStarted) {
-    initialiseFromLocalStorage();
-  }
   return (
     <View>
       <Text>
