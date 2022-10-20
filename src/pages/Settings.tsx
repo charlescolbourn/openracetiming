@@ -29,6 +29,8 @@ const Settings = () => {
   const initialiseFromLocalStorage = () => {
     LocalStorage.getRaces()
       .then((raceList) => {
+        //       setDebug(tabulateRaces(JSON.parse(raceList)));
+        // setDebug(Object.values(raceList));
         //       let listTable = raceList ? raceList
         //         .sort((a, b) => a.raceDate < b.raceDate)
         //         .map((race) => {
@@ -47,12 +49,14 @@ const Settings = () => {
   };
 
   const tabulateRaces = (raceList) => {
-    return raceList.map((key) => {
+    return raceList.map((value) => {
       return (
-        <TouchableOpacity onPress={selectRace(raceList[key])}>
-          <DataTable.Row key={key}>
-            <DataTable.Cell key="name">{raceList[key].racename}</DataTable.Cell>
-            <DataTable.Cell key="date">{raceList[key].racedate}</DataTable.Cell>
+        <TouchableOpacity onPress={selectRace(value)}>
+          <DataTable.Row key={value.raceName}>
+            <DataTable.Cell key="name">{value.raceName}</DataTable.Cell>
+            <DataTable.Cell key="date">
+              {moment(value.raceDate).format('DD/MM/YYYY')}
+            </DataTable.Cell>
           </DataTable.Row>
         </TouchableOpacity>
       );
@@ -122,6 +126,7 @@ const Settings = () => {
   return (
     <>
       <View>
+        <Text>Select a race or create a new race</Text>
         <DataTable>{availableRaces}</DataTable>
       </View>
 

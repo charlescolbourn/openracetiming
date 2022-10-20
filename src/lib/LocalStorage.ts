@@ -34,14 +34,16 @@ export default class LocalStorage {
       return raceList
         ? AsyncStorage.multiGet(
             raceListArray.map((key) => `@ORT_racedetails:${key}`)
-          )
-        : //                 .then( (arrString) => JSON.parse(arrString))
-          new Promise(() => []);
+          ).then((arr) => {
+            return arr.map((key) => JSON.parse(key[1]));
+          })
+        : new Promise(() => []);
     });
   }
 
   public static saveRace(raceData) {
     const raceKey = `${raceData.raceName}:${raceData.raceDate}`;
+
     return AsyncStorage.setItem(
       `@ORT_racedetails:${raceKey}`,
       JSON.stringify(raceData)
