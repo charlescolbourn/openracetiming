@@ -21,85 +21,82 @@ const Timing = ({ navigation }) => {
   const [finishrows, setFinishrows] = React.useState([]);
   const [currentRace, setCurrentRace] = React.useState([]);
 
-
-
   const initialiseFromLocalStorage = () => {
     //need to handle case where race is finished
-    LocalStorage.getCurrentRace().then( (raceDetails) => {
-      setCurrentRace(JSON.parse(raceDetails))
-        LocalStorage.getStartTime(Utils.getRaceKey(raceDetails))
-          .then((timestamp: string | null) => {
-            if (timestamp) {
-              setStartTime(parseInt(timestamp));
-              if (!finished) {
-                setShowStarted(true);
-                setDisplayButtons(true);
-              }
+    LocalStorage.getCurrentRace().then((raceDetails) => {
+      setCurrentRace(JSON.parse(raceDetails));
+      LocalStorage.getStartTime(Utils.getRaceKey(raceDetails))
+        .then((timestamp: string | null) => {
+          if (timestamp) {
+            setStartTime(parseInt(timestamp));
+            if (!finished) {
+              setShowStarted(true);
+              setDisplayButtons(true);
             }
-          })
-          .catch((e) => Alert.alert(JSON.stringify(e)));
-        });
+          }
+        })
+        .catch((e) => Alert.alert(JSON.stringify(e)));
+    });
   };
-
-
-
 
   const writeTime = (entrantId: string = 'unknown') => {
     const timeNow = Date.now();
     const elapsed = timeNow - startTime;
-Alert.alert(entrantId);
-//     LocalStorage.writeFinishTime(Utils.getRaceKey(currentRace),elapsed, entrantId)
-//       .then(() => {
-//         LocalStorage.getEntrant(Utils.getRaceKey(currentRace),entrantId)
-//           .then((entrant) => {
-//             let entrantObj = JSON.parse(entrant);
-//
-//             const timeString = moment(elapsed).format('HH:mm:ss.S');
-//             entrantObj.finishtime = timeString;
-//             const newFinishrows = [
-//               ...finishrows,
-//               <EntrantRecordLine
-//                 record={entrantObj}
-//                 fieldsToDisplay={[
-//                   ...Object.keys(entrantObj).slice(0, 2),
-//                   'finishtime',
-//                 ]}
-//               />,
-//             ];
-//             setFinishrows(newFinishrows);
-//           })
-//           .catch((e) => setResultsContent(JSON.stringify(e.message)));
-//       })
-//
-//       .catch((e) => Alert.alert(JSON.stringify(e)));
-  };
+    LocalStorage.writeFinishTime(
+      Utils.getRaceKey(currentRace),
+      elapsed,
+      entrantId
+    )
+      .then(() => {
+        LocalStorage.getEntrant(Utils.getRaceKey(currentRace), entrantId)
+          .then((entrant) => {
+            let entrantObj = JSON.parse(entrant);
 
+            const timeString = moment(elapsed).format('HH:mm:ss.S');
+            entrantObj.finishtime = timeString;
+            const newFinishrows = [
+              ...finishrows,
+              <EntrantRecordLine
+                record={entrantObj}
+                fieldsToDisplay={[
+                  ...Object.keys(entrantObj).slice(0, 2),
+                  'finishtime',
+                ]}
+              />,
+            ];
+            setFinishrows(newFinishrows);
+          })
+          .catch((e) => setResultsContent(JSON.stringify(e.message)));
+      })
+
+      .catch((e) => Alert.alert(JSON.stringify(e)));
+  };
 
   React.useEffect(() => {
     const initNfc = async () => {
       await NfcManager.registerTagEvent();
+
+      //   });
+      //
+      //   React.useEffect(() => {
+      if (!showStarted) {
+        initialiseFromLocalStorage();
+      }
+      NfcManager.setEventListener(NfcEvents.DiscoverTag, (tag: any) => {
+        if (showStarted) {
+          writeTime(tag.id);
+        } else {
+          setResultsContent('Testing NFC tag: ' + tag.id);
+        }
+      });
     };
     initNfc().catch((e) => Alert.alert(JSON.stringify(e)));
-  });
-
-  React.useEffect(() => {
-
-  if (!showStarted) {
-    initialiseFromLocalStorage();
-  }
-    NfcManager.setEventListener(NfcEvents.DiscoverTag, (tag: any) => {
-      if (showStarted) {
-        writeTime(tag.id);
-      } else {
-        setResultsContent('Testing NFC tag: ' + tag.id);
-      }
-    });
   });
 
   const startEvent = () => {
     const now = Date.now();
     setStartTime(now);
-    LocalStorage.setStartTime(Utils.getRaceKey(currentRace),now);
+    LocalStorage.setStartTime(Utils.getRaceKey(currentRace), now);
     setShowStarted(true);
     setDisplayButtons(true);
   };
@@ -128,12 +125,14 @@ Alert.alert(entrantId);
     );
   };
 
-
-
   return (
     <View>
       <Text>
-        {currentRace ? `${currentRace.raceName} ${moment(currentRace.raceDate).format('DD/MM/YYYY')}` : ''}
+        {currentRace
+          ? `${currentRace.raceName} ${moment(currentRace.raceDate).format(
+              'DD/MM/YYYY'
+            )}`
+          : ''}
       </Text>
       {showStarted ? (
         <Button

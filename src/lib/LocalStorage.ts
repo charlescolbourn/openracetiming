@@ -9,12 +9,21 @@ export default class LocalStorage {
     return AsyncStorage.getItem(`@ORT_starttimes:${racekey}:default`);
   }
 
-  public static writeFinishTime(racekey: string, timestamp: number, id: string) {
-    return AsyncStorage.setItem(`@ORT_finishtimes:${racekey}:${id}`, `${timestamp}`);
+  public static writeFinishTime(
+    racekey: string,
+    timestamp: number,
+    id: string
+  ) {
+    return AsyncStorage.setItem(
+      `@ORT_finishtimes:${racekey}:${id}`,
+      `${timestamp}`
+    );
   }
 
   public static getEntrant(racekey: string, entrantId: string) {
-    return AsyncStorage.getItem(`@ORT_registeredEntrants:${racekey}:${entrantId}`);
+    return AsyncStorage.getItem(
+      `@ORT_registeredEntrants:${racekey}:${entrantId}`
+    );
   }
 
   public static clear() {
