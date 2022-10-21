@@ -23,21 +23,25 @@ const Timing = ({ navigation }) => {
 
   const initialiseFromLocalStorage = () => {
     //need to handle case where race is finished
-    LocalStorage.getCurrentRace().then((raceDetails) => {
-      setCurrentRace(JSON.parse(raceDetails));
-      LocalStorage.getStartTime(Utils.getRaceKey(raceDetails))
-        .then((timestamp: string | null) => {
-          if (timestamp) {
-            setStartTime(parseInt(timestamp));
-            if (!finished) {
-              setShowStarted(true);
-              setDisplayButtons(true);
-            }
+
+    LocalStorage.getStartTime(Utils.getRaceKey(currentRace))
+      .then((timestamp: string | null) => {
+        if (timestamp) {
+          setStartTime(parseInt(timestamp));
+          if (!finished) {
+            setShowStarted(true);
+            setDisplayButtons(true);
           }
-        })
-        .catch((e) => Alert.alert(JSON.stringify(e)));
-    });
+        }
+      })
+      .catch((e) => Alert.alert(JSON.stringify(e)));
   };
+
+  React.useEffect(() => {
+    LocalStorage.getCurrentRace().then((raceDetails) =>
+      setCurrentRace(JSON.parse(raceDetails))
+    );
+  });
 
   const writeTime = (entrantId: string = 'unknown') => {
     const timeNow = Date.now();
