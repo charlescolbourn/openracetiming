@@ -6,8 +6,9 @@ import React from 'react';
 import NfcManager, { NfcEvents } from 'react-native-nfc-manager';
 import { Text, View, Button, Alert } from 'react-native';
 import { DataTable } from 'react-native-paper';
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import moment from 'moment';
+import LocalStorage from '../lib/LocalStorage';
+import Utils from '../lib/Utils';
 
 import EntrantRecordLine from './EntrantRecordLine';
 
@@ -17,70 +18,41 @@ const Timing = ({ navigation }) => {
   const [resultsContent, setResultsContent] = React.useState('');
   const [displayButtons, setDisplayButtons] = React.useState(false);
   const [finished, setFinished] = React.useState(false);
-  const [finishrows, setFinishrows] = React.useState('');
+  const [finishrows, setFinishrows] = React.useState([]);
+  const [currentRace, setCurrentRace] = React.useState([]);
 
   const initialiseFromLocalStorage = () => {
     //need to handle case where race is finished
-    getStartTimeLocalStorage()
-      .then((timestamp: string | null) => {
-        if (timestamp) {
-          setStartTime(parseInt(timestamp));
-          if (!finished) {
-            setShowStarted(true);
-            setDisplayButtons(true);
+    LocalStorage.getCurrentRace().then((raceDetails) => {
+      setCurrentRace(JSON.parse(raceDetails));
+      LocalStorage.getStartTime(Utils.getRaceKey(raceDetails))
+        .then((timestamp: string | null) => {
+          if (timestamp) {
+            setStartTime(parseInt(timestamp));
+            if (!finished) {
+              setShowStarted(true);
+              setDisplayButtons(true);
+            }
           }
-        }
-      })
-      .catch((e) => Alert.alert(JSON.stringify(e)));
+        })
+        .catch((e) => Alert.alert(JSON.stringify(e)));
+    });
   };
-
-  const setStartTimeLocalStorage = (timestamp: number) => {
-    return AsyncStorage.setItem('@ORT_starttimes:default', `${timestamp}`);
-  };
-  //   const removeStartTimeLocalStorage = () => {
-  //     return AsyncStorage.removeItem('@ORT_starttimes:default');
-  //   }
-  const getStartTimeLocalStorage = () => {
-    return AsyncStorage.getItem('@ORT_starttimes:default');
-  };
-
-  const writeFinishTimeLocalStorage = (timestamp: number, id: string) => {
-    return AsyncStorage.setItem(`@ORT_finishtimes:${id}`, `${timestamp}`);
-  };
-
-  // 	const displayResultsFromLocalContent = () => {
-  // 		AsyncStorage.getAllKeys().then((arrayOfKeys) => {
-  // 			arrayOfKeys.forEach((key) => {
-  // 				if (key.startsWith('@ORT_finishtimes')) {
-  // 					const id = key.substring(17, key.length);
-  // 					AsyncStorage.getItem(key)
-  // 						.then((item) => {
-  // 							if (!item) {
-  // 								throw 'Stored finish time is null';
-  // 							}
-  // 							const elapsed = new Date(item);
-  // 							const timeString = `${elapsed.getHours()}:${elapsed.getMinutes()}:${elapsed.getSeconds()}`;
-  // 							setResultsContent(
-  // 								resultsContent + '\n' + id + ' - ' + timeString
-  // 							);
-  // 						})
-  // 						.catch((e) => Alert.alert(JSON.stringify(e)));
-  // 				}
-  // 			});
-  // 		});
-  // 	};
 
   const writeTime = (entrantId: string = 'unknown') => {
     const timeNow = Date.now();
-    const elapsed = new Date(timeNow - startTime);
-
-    writeFinishTimeLocalStorage(elapsed.getTime(), entrantId)
+    const elapsed = timeNow - startTime;
+    LocalStorage.writeFinishTime(
+      Utils.getRaceKey(currentRace),
+      elapsed,
+      entrantId
+    )
       .then(() => {
-        getEntrantFromLocalStorage(entrantId)
+        LocalStorage.getEntrant(Utils.getRaceKey(currentRace), entrantId)
           .then((entrant) => {
             let entrantObj = JSON.parse(entrant);
 
-            const timeString = `${elapsed.getHours()}:${elapsed.getMinutes()}:${elapsed.getSeconds()}`;
+            const timeString = moment(elapsed).format('HH:mm:ss.S');
             entrantObj.finishtime = timeString;
             const newFinishrows = [
               ...finishrows,
@@ -100,24 +72,31 @@ const Timing = ({ navigation }) => {
       .catch((e) => Alert.alert(JSON.stringify(e)));
   };
 
-  const getEntrantFromLocalStorage = (entrantId) => {
-    return AsyncStorage.getItem(`@ORT_registeredEntrants:${entrantId}`);
-  };
-
   React.useEffect(() => {
-    NfcManager.setEventListener(NfcEvents.DiscoverTag, (tag: any) => {
-      if (showStarted) {
-        writeTime(tag.id);
-      } else {
-        setResultsContent('Testing NFC tag: ' + tag.id);
+    const initNfc = async () => {
+      await NfcManager.registerTagEvent();
+
+      //   });
+      //
+      //   React.useEffect(() => {
+      if (!showStarted) {
+        initialiseFromLocalStorage();
       }
-    });
+      NfcManager.setEventListener(NfcEvents.DiscoverTag, (tag: any) => {
+        if (showStarted) {
+          writeTime(tag.id);
+        } else {
+          setResultsContent('Testing NFC tag: ' + tag.id);
+        }
+      });
+    };
+    initNfc().catch((e) => Alert.alert(JSON.stringify(e)));
   });
 
   const startEvent = () => {
     const now = Date.now();
     setStartTime(now);
-    setStartTimeLocalStorage(now);
+    LocalStorage.setStartTime(Utils.getRaceKey(currentRace), now);
     setShowStarted(true);
     setDisplayButtons(true);
   };
@@ -140,28 +119,21 @@ const Timing = ({ navigation }) => {
     //     setResultsContent('');
     setFinishrows([]);
     setStartTime(0);
-    AsyncStorage.clear();
+    LocalStorage.clear();
     NfcManager.cancelTechnologyRequest().catch((e) =>
       Alert.alert(JSON.stringify(e))
     );
   };
 
-  //   const backgroundStyle = {
-  //     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  //   };
-
-  React.useEffect(() => {
-    const initNfc = async () => {
-      await NfcManager.registerTagEvent();
-    };
-    initNfc().catch((e) => Alert.alert(JSON.stringify(e)));
-  });
-
-  if (!showStarted) {
-    initialiseFromLocalStorage();
-  }
   return (
     <View>
+      <Text>
+        {currentRace
+          ? `${currentRace.raceName} ${moment(currentRace.raceDate).format(
+              'DD/MM/YYYY'
+            )}`
+          : ''}
+      </Text>
       {showStarted ? (
         <Button
           onPress={() => {
