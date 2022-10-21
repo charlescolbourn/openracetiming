@@ -37,11 +37,11 @@ const Timing = ({ navigation }) => {
       .catch((e) => Alert.alert(JSON.stringify(e)));
   };
 
-  React.useEffect(() => {
+  if (!currentRace) {
     LocalStorage.getCurrentRace().then((raceDetails) =>
       setCurrentRace(JSON.parse(raceDetails))
     );
-  });
+  }
 
   const writeTime = (entrantId: string = 'unknown') => {
     const timeNow = Date.now();
