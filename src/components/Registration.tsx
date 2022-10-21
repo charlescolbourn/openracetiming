@@ -91,11 +91,14 @@ const Registration = () => {
       await NfcManager.registerTagEvent();
     };
     initNfc().catch((e) => Alert.alert(JSON.stringify(e)));
-
   });
-  React.useEffect( () => {
-    LocalStorage.getCurrentRace().then( (raceDetails) => setCurrentRace(JSON.parse(raceDetails)) );
-  });
+  //React.useEffect( () => {
+  if (!currentRace) {
+    LocalStorage.getCurrentRace().then((raceDetails) =>
+      setCurrentRace(JSON.parse(raceDetails))
+    );
+  }
+  //});
 
   const registerId = (nfcId: string) => {
     let copyParsedData = parsedData;
@@ -104,7 +107,10 @@ const Registration = () => {
     //         Alert.alert(JSON.stringify(parsedData[currentlySelectedIndex]));
     setNfcRegistered(true);
     //TODO this is a really shitty way of implementing this functionality - too big a refresh?
-    LocalStorage.addToStarterList(Utils.getRaceKey(currentRace),parsedData[currentlySelectedIndex]);
+    LocalStorage.addToStarterList(
+      Utils.getRaceKey(currentRace),
+      parsedData[currentlySelectedIndex]
+    );
   };
 
   React.useEffect(() => {
