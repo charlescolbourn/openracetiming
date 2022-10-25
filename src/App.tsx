@@ -4,7 +4,7 @@
 
 import Settings from './pages/Settings';
 import Timing from './components/Timing';
-import Identify from './components/Identify';
+import Results from './components/Results';
 import Registration from './components/Registration';
 
 import * as React from 'react';
@@ -31,10 +31,10 @@ function TimingScreen() {
 }
 
 //eslint-disable-next-line
-function IdentifyScreen() {
+function ResultsScreen() {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Identify />
+      <Results />
     </View>
   );
 }
@@ -89,7 +89,7 @@ const App = () => {
           />
           <Tab.Screen
             name="Results"
-            component={Identify}
+            component={Results}
             options={{
               headerStyle: { height: 80 },
               headerTitle: (props) => <LogoTitle {...props} />,
