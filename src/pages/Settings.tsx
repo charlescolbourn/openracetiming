@@ -42,7 +42,9 @@ const Settings = () => {
       .catch((e) => setDebug(JSON.stringify(e.message)));
   };
 
-  React.useEffect(() => initialiseFromLocalStorage());
+  //   React.useEffect(() =>
+  initialiseFromLocalStorage();
+  // );
 
   const selectRace = (raceInfo) => {
     LocalStorage.setCurrentRace(raceInfo);
@@ -51,10 +53,15 @@ const Settings = () => {
   const tabulateRaces = (raceList) => {
     return raceList.map((value) => {
       return (
-        <TouchableOpacity onPress={() => selectRace(value)}>
+        <TouchableOpacity
+          key={value.raceName}
+          onPress={() => selectRace(value)}
+        >
           <DataTable.Row key={value.raceName}>
-            <DataTable.Cell key="name">{value.raceName}</DataTable.Cell>
-            <DataTable.Cell key="date">
+            <DataTable.Cell key={value.raceName}>
+              {value.raceName}
+            </DataTable.Cell>
+            <DataTable.Cell key={value.raceDate}>
               {moment(value.raceDate).format('DD/MM/YYYY')}
             </DataTable.Cell>
           </DataTable.Row>

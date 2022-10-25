@@ -79,4 +79,8 @@ export default class LocalStorage {
   public static getCurrentRace() {
     return AsyncStorage.getItem('@ORT_currentrace');
   }
+
+  public static getResults(raceKey) {
+    return AsyncStorage.getItem(`@ORT_finishtimes:${raceKey}`);
+  }
 }

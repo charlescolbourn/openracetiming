@@ -88,7 +88,7 @@ const App = () => {
             }}
           />
           <Tab.Screen
-            name="Identify"
+            name="Results"
             component={Identify}
             options={{
               headerStyle: { height: 80 },

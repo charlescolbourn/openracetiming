@@ -92,13 +92,12 @@ const Registration = () => {
     };
     initNfc().catch((e) => Alert.alert(JSON.stringify(e)));
   });
-  //React.useEffect( () => {
+
   if (!currentRace) {
     LocalStorage.getCurrentRace().then((raceDetails) =>
       setCurrentRace(JSON.parse(raceDetails))
     );
   }
-  //});
 
   const registerId = (nfcId: string) => {
     let copyParsedData = parsedData;
