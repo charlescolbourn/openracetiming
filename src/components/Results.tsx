@@ -18,7 +18,7 @@ const Results = () => {
 
   const displayResultsFromLocalContent = () => {
     LocalStorage.getResults(Utils.getRaceKey(currentRace)).then((results) => {
-      setResultsData(JSON.stringify(results));
+      setResultsData(results);
     });
   };
 
@@ -37,7 +37,7 @@ const Results = () => {
 
         {/*                         <CurrentRaceView raceDetails={currentRace}/>   */}
       </Text>
-      <Text>{resultsData}</Text>
+      <Text>{JSON.stringify(resultsData)}</Text>
     </View>
   );
 };

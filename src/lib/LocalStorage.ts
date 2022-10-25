@@ -15,8 +15,8 @@ export default class LocalStorage {
     id: string
   ) {
     return AsyncStorage.setItem(
-      `@ORT_finishtimes:${racekey}:${id}`,
-      `${timestamp}`
+      `@ORT_finishtimes:${racekey}`,
+      `{'${id}':'${timestamp}'}`
     );
   }
 
