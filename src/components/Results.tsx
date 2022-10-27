@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Button } from 'react-native';
 import LocalStorage from '../lib/LocalStorage';
 import Utils from '../lib/Utils';
 import moment from 'moment';
@@ -9,7 +9,7 @@ const Results = () => {
   const [currentRace, setCurrentRace] = React.useState({});
 
   React.useEffect(() => {
-    if (Object.keys(currentRace).length === 0) {
+    if (!currentRace || Object.keys(currentRace).length === 0) {
       LocalStorage.getCurrentRace().then((raceDetails) => {
         setCurrentRace(JSON.parse(raceDetails));
       });
@@ -29,7 +29,7 @@ const Results = () => {
   return (
     <View>
       <Text>
-        {Object.keys(currentRace).length > 0
+        {currentRace && Object.keys(currentRace).length > 0
           ? `${currentRace.raceName} ${moment(currentRace.raceDate).format(
               'DD/MM/YYYY'
             )}`
@@ -38,6 +38,7 @@ const Results = () => {
         {/*                         <CurrentRaceView raceDetails={currentRace}/>   */}
       </Text>
       <Text>{JSON.stringify(resultsData)}</Text>
+      <Button title="reload" onPress={() => displayResultsFromLocalContent()} />
     </View>
   );
 };

@@ -14,9 +14,27 @@ export default class LocalStorage {
     timestamp: number,
     id: string
   ) {
+    // catch and write might not be necessary
+    return AsyncStorage.getItem(`@ORT_finishtimes:${racekey}`)
+      .then((times) => {
+        LocalStorage.writeFinishToStorage(times, racekey, timestamp, id);
+      })
+      .catch(() => {
+        LocalStorage.writeFinishToStorage('', racekey, timestamp, id);
+      });
+  }
+
+  private static writeFinishToStorage(
+    times: string,
+    racekey: string,
+    timestamp: number,
+    id: string
+  ) {
+    let timesObj = times ? JSON.parse(times) : {};
+    timesObj[id] = timestamp;
     return AsyncStorage.setItem(
       `@ORT_finishtimes:${racekey}`,
-      `{'${id}':'${timestamp}'}`
+      JSON.stringify(timesObj)
     );
   }
 

@@ -21,6 +21,7 @@ const Timing = ({ navigation }) => {
   const [finished, setFinished] = React.useState(false);
   const [finishrows, setFinishrows] = React.useState([]);
   const [currentRace, setCurrentRace] = React.useState({});
+  const [debugContent, setDebugContent] = React.useState('');
 
   const initialiseFromLocalStorage = () => {
     //need to handle case where race is finished
@@ -35,11 +36,11 @@ const Timing = ({ navigation }) => {
           }
         }
       })
-      .catch((e) => Alert.alert(JSON.stringify(e)));
+      .catch((e) => setDebugContent(JSON.stringify(e)));
   };
 
   React.useEffect(() => {
-    if (Object.keys(currentRace).length === 0) {
+    if (!currentRace || Object.keys(currentRace).length === 0) {
       LocalStorage.getCurrentRace().then((raceDetails) => {
         setCurrentRace(JSON.parse(raceDetails));
       });
@@ -73,10 +74,10 @@ const Timing = ({ navigation }) => {
             ];
             setFinishrows(newFinishrows);
           })
-          .catch((e) => setResultsContent(JSON.stringify(e.message)));
+          .catch((e) => setDebugContent(JSON.stringify(e.message)));
       })
 
-      .catch((e) => Alert.alert(JSON.stringify(e)));
+      .catch((e) => setDebugContent(JSON.stringify(e.message)));
   };
 
   React.useEffect(() => {
@@ -97,7 +98,7 @@ const Timing = ({ navigation }) => {
         }
       });
     };
-    initNfc().catch((e) => Alert.alert(JSON.stringify(e)));
+    initNfc().catch((e) => setDebugContent(e.message));
   });
 
   const startEvent = () => {
@@ -135,7 +136,7 @@ const Timing = ({ navigation }) => {
   return (
     <View>
       <Text>
-        {Object.keys(currentRace).length > 0
+        {currentRace && Object.keys(currentRace).length > 0
           ? `${currentRace.raceName} ${moment(currentRace.raceDate).format(
               'DD/MM/YYYY'
             )}`
@@ -159,6 +160,7 @@ const Timing = ({ navigation }) => {
       <View>
         <DataTable>{finishrows}</DataTable>
       </View>
+      <Text>{debugContent}</Text>
       <Text>{resultsContent}</Text>
       <Button
         onPress={() => {

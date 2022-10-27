@@ -14,6 +14,7 @@ import NfcManager, { NfcEvents } from 'react-native-nfc-manager';
 import LocalStorage from '../lib/LocalStorage';
 import Utils from '../lib/Utils';
 import EntrantRecordLine from './EntrantRecordLine';
+import moment from 'moment';
 
 const Registration = () => {
   const [parsedData, setParsedData] = React.useState([]);
@@ -93,11 +94,18 @@ const Registration = () => {
     initNfc().catch((e) => Alert.alert(JSON.stringify(e)));
   });
 
-  if (!currentRace) {
-    LocalStorage.getCurrentRace().then((raceDetails) =>
-      setCurrentRace(JSON.parse(raceDetails))
-    );
-  }
+  React.useEffect(() => {
+    if (!currentRace || Object.keys(currentRace).length === 0) {
+      LocalStorage.getCurrentRace().then((raceDetails) => {
+        setCurrentRace(JSON.parse(raceDetails));
+      });
+    }
+  });
+  //   if (!currentRace) {
+  //     LocalStorage.getCurrentRace().then((raceDetails) =>
+  //       setCurrentRace(JSON.parse(raceDetails))
+  //     );
+  //   }
 
   const registerId = (nfcId: string) => {
     let copyParsedData = parsedData;
@@ -123,6 +131,15 @@ const Registration = () => {
 
   return (
     <View>
+      <Text>
+        {currentRace && Object.keys(currentRace).length > 0
+          ? `${currentRace.raceName} ${moment(currentRace.raceDate).format(
+              'DD/MM/YYYY'
+            )}`
+          : 'No race selected'}
+
+        {/*                         <CurrentRaceView raceDetails={currentRace}/>   */}
+      </Text>
       <View>
         <Text>
           <Button
