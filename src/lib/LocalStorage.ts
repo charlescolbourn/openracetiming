@@ -2,7 +2,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
 export default class LocalStorage {
   public static setStartTime(racekey: string, timestamp: number) {
-    return AsyncStorage.setItem('@ORT_starttimes:default', `${timestamp}`);
+    return AsyncStorage.setItem(
+      '@ORT_starttimes:${racekey}:default',
+      `${timestamp}`
+    );
   }
 
   public static getStartTime(racekey) {
@@ -100,5 +103,13 @@ export default class LocalStorage {
 
   public static getResults(raceKey) {
     return AsyncStorage.getItem(`@ORT_finishtimes:${raceKey}`);
+  }
+
+  public static getEverything() {
+    return AsyncStorage.getAllKeys()
+      .then((keys) => {
+        return AsyncStorage.multiGet(keys);
+      })
+      .catch((e) => Alert.alert(e.message));
   }
 }
