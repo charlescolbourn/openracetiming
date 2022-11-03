@@ -69,6 +69,14 @@ EoD - someone taking details and pushing to the API
 
 Drop downs for category & club
 
+Notification from previous CP when first runners come through
+
+Compile for Desktop RN & test
+
+Just a note: there is a trade off - accurate vs easy. The NFC path is really easy for the 
+ marshalls/RO, but not as accurate as 'click to finish'. The traditional 'click to finish' then
+ reconcile with the race numbers in a funnel is super-accurate, but harder to manage.
+
 ## APIs to implement
 
 Upload times
