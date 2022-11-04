@@ -17,7 +17,7 @@ import EntrantRecordLine from './EntrantRecordLine';
 import moment from 'moment';
 
 const Registration = () => {
-  const [parsedData, setParsedData] = React.useState([]);
+  const [records, setRecords] = React.useState([]);
   //   const [allEntriesData, setAllEntriesData] = React.useState([]);
   const [entryData, setEntryData] = React.useState([]);
   const [currentlySelectedIndex, setCurrentlySelectedIndex] = React.useState(0);
@@ -28,6 +28,8 @@ const Registration = () => {
   //   const [raceNumber, setRaceNumber] = React.useState('');
   const [nfcRegistered, setNfcRegistered] = React.useState(false);
   const [currentRace, setCurrentRace] = React.useState({});
+  const [debug, setDebug] = React.useState('');
+  const [tableContent, setTableContent] = React.useState('');
 
   const parseCSV = (data) => {
     const results = readString(data, { header: true, skipEmptyLines: true });
@@ -98,25 +100,34 @@ const Registration = () => {
     if (!currentRace || Object.keys(currentRace).length === 0) {
       LocalStorage.getCurrentRace().then((raceDetails) => {
         setCurrentRace(JSON.parse(raceDetails));
+        populateExistingEntryList(JSON.parse(raceDetails));
       });
     }
   });
-  //   if (!currentRace) {
-  //     LocalStorage.getCurrentRace().then((raceDetails) =>
-  //       setCurrentRace(JSON.parse(raceDetails))
-  //     );
-  //   }
+
+  const populateExistingEntryList = (raceDetails) => {
+    LocalStorage.getAllEntrants(Utils.getRaceKey(raceDetails))
+      .then((entrants) => {
+        const parsedEntrants = entrants
+          .filter((entrant) => entrant)
+          .map((entrant) => JSON.parse(entrant));
+        setRecords(parsedEntrants);
+        //         setDebug(JSON.stringify(parsedEntrants));
+        populateEntryTable(parsedEntrants);
+      })
+      .catch((e) => setDebug(e.message));
+  };
 
   const registerId = (nfcId: string) => {
-    let copyParsedData = parsedData;
-    copyParsedData[currentlySelectedIndex].nfcId = nfcId;
-    setParsedData(copyParsedData);
+    let copyRecords = records;
+    copyRecords[currentlySelectedIndex].nfcId = nfcId;
+    setRecords(copyRecords);
     //         Alert.alert(JSON.stringify(parsedData[currentlySelectedIndex]));
     setNfcRegistered(true);
     //TODO this is a really shitty way of implementing this functionality - too big a refresh?
     LocalStorage.addToStarterList(
       Utils.getRaceKey(currentRace),
-      parsedData[currentlySelectedIndex]
+      records[currentlySelectedIndex]
     );
   };
 
@@ -129,8 +140,20 @@ const Registration = () => {
     });
   });
 
+  const populateEntryTable = (entrants = records) => {
+    setTableContent(
+      <>
+        {entrants.length > 0 ? headerLine(Object.keys(entrants[0])) : ''}
+        {entrants.length > 0
+          ? entrants.map((record, index) => rowsLine(index, record))
+          : ''}
+      </>
+    );
+  };
+
   return (
     <View>
+      <Text>{debug}</Text>
       <Text>
         {currentRace && Object.keys(currentRace).length > 0
           ? `${currentRace.raceName} ${moment(currentRace.raceDate).format(
@@ -153,7 +176,8 @@ const Registration = () => {
                 const file = await fetch(response[0].uri);
                 const data = await file.text(); //JSON.stringify(file);
 
-                setParsedData(parseCSV(data));
+                setRecords(parseCSV(data));
+                populateEntryTable();
               } catch (e) {
                 setStatusMessage('ERROR:' + e.message);
               }
@@ -162,12 +186,7 @@ const Registration = () => {
         </Text>
       </View>
       <View>
-        <DataTable>
-          {parsedData.length > 0 ? headerLine(Object.keys(parsedData[0])) : ''}
-          {parsedData.length > 0
-            ? parsedData.map((record, index) => rowsLine(index, record))
-            : ''}
-        </DataTable>
+        <DataTable>{tableContent}</DataTable>
       </View>
       {addOrEdit ? (
         <View backgroundColor="#AAAAAAAA">

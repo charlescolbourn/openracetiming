@@ -42,9 +42,20 @@ export default class LocalStorage {
   }
 
   public static getEntrant(racekey: string, entrantId: string) {
-    return AsyncStorage.getItem(
-      `@ORT_registeredEntrants:${racekey}:${entrantId}`
-    );
+    return AsyncStorage.getItem(`@ORT_entrantsByKey:${racekey}:${entrantId}`);
+  }
+
+  public static getAllEntrants(racekey: string) {
+    return AsyncStorage.getAllKeys().then((keys) => {
+      const items = Promise.all(
+        keys.map((key) => {
+          if (key.startsWith(`@ORT_entrantsByKey:${racekey}`)) {
+            return AsyncStorage.getItem(key);
+          }
+        })
+      );
+      return items;
+    });
   }
 
   public static clear() {
@@ -53,7 +64,7 @@ export default class LocalStorage {
 
   public static addToStarterList(racekey, record) {
     return AsyncStorage.setItem(
-      `@ORT_registeredEntrants:${racekey}:${record.nfcId}`,
+      `@ORT_entrantsByKey:${racekey}:${record.nfcId}`,
       JSON.stringify(record)
     );
   }

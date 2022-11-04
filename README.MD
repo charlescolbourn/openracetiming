@@ -25,9 +25,10 @@ v1.4.0 - Observer/results mode. (Possible sls framework API to record times)
 
 ## Next Steps
 
-Create settings page & save settings to local
+Load preimported entrant list when opening 'registration'
 
-Migrate settings from page to modal that appears on start
+refactor display in registration
+
 
 Implement some tests
 
