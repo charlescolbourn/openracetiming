@@ -19,7 +19,7 @@ import DeveloperOptions from './DeveloperOptions';
 
 import moment from 'moment';
 
-const Settings = () => {
+const Settings = ({ navigation }) => {
   const DEVSETTINGS = true;
   const [availableRaces, setAvailableRaces] = React.useState([]);
   const [raceData, setRaceData] = React.useState({ massStart: true });
@@ -50,6 +50,7 @@ const Settings = () => {
 
   const selectRace = (raceInfo) => {
     LocalStorage.setCurrentRace(raceInfo);
+    navigation.jumpTo('Registration');
   };
 
   const tabulateRaces = (raceList) => {

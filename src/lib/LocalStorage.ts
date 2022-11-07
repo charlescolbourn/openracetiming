@@ -3,7 +3,7 @@ import { Alert } from 'react-native';
 export default class LocalStorage {
   public static setStartTime(racekey: string, timestamp: number) {
     return AsyncStorage.setItem(
-      '@ORT_starttimes:${racekey}:default',
+      `@ORT_starttimes:${racekey}:default`,
       `${timestamp}`
     );
   }

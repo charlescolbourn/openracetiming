@@ -23,6 +23,8 @@ const Results = () => {
     }
   });
 
+  const exportResults = () => {};
+
   const displayResultsFromLocalContent = () => {
     LocalStorage.getResults(Utils.getRaceKey(currentRace))
       .then((results) => {
@@ -38,22 +40,25 @@ const Results = () => {
   };
 
   const formatResultsTable = (results) => {
+    let tableContent = [];
     Object.keys(results).map((key) => {
-      //setDebug(key);
       return LocalStorage.getEntrant(Utils.getRaceKey(currentRace), key)
         .then((entrantRecordString) => {
           let extendedEntrantRecord = JSON.parse(entrantRecordString);
           extendedEntrantRecord.finishtime = moment(results[key]).format(
             'HH:mm:ss.S'
           );
-          setResultsData([
-            ...resultsData,
-            <EntrantRecordLine record={extendedEntrantRecord} />,
-          ]);
+          tableContent.push(
+            <EntrantRecordLine
+              key={extendedEntrantRecord.nfcId}
+              record={extendedEntrantRecord}
+            />
+          );
           //setDebug(JSON.stringify(extendedEntrantRecord));
         })
         .catch((e) => setDebug(e.message));
     });
+    setResultsData(tableContent);
   };
 
   //   React.useEffect(() => {
@@ -84,6 +89,7 @@ const Results = () => {
       <View>
         <CSVLink data={csvData}>Download me</CSVLink>
       </View>
+
     </View>
   );
 };
