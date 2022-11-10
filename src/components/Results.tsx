@@ -6,6 +6,8 @@ import Utils from '../lib/Utils';
 import moment from 'moment';
 import EntrantRecordLine from './EntrantRecordLine';
 
+import { CSVLink } from 'react-csv';
+
 const Results = () => {
   const [resultsData, setResultsData] = React.useState([]);
   const [currentRace, setCurrentRace] = React.useState({});
@@ -58,6 +60,13 @@ const Results = () => {
   //     displayResultsFromLocalContent();
   //   });
 
+  const csvData = [
+    ['firstname', 'lastname', 'email'],
+    ['Ahmed', 'Tomi', 'ah@smthing.co.com'],
+    ['Raed', 'Labes', 'rl@smthing.co.com'],
+    ['Yezzi', 'Min l3b', 'ymin@cocococo.com'],
+  ];
+
   return (
     <View>
       <Text>{debug}</Text>
@@ -72,6 +81,9 @@ const Results = () => {
       </Text>
       <DataTable>{resultsData}</DataTable>
       <Button title="reload" onPress={() => displayResultsFromLocalContent()} />
+      <View>
+        <CSVLink data={csvData}>Download me</CSVLink>
+      </View>
     </View>
   );
 };
