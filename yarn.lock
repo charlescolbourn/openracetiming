@@ -6624,6 +6624,11 @@
   "resolved" "https://registry.npmjs.org/range-parser/-/range-parser-1.2.1.tgz"
   "version" "1.2.1"
 
+"react-csv@^2.2.2":
+  "integrity" "sha512-RG5hOcZKZFigIGE8LxIEV/OgS1vigFQT4EkaHeKgyuCbUAu9Nbd/1RYq++bJcJJ9VOqO/n9TZRADsXNDR4VEpw=="
+  "resolved" "https://registry.npmjs.org/react-csv/-/react-csv-2.2.2.tgz"
+  "version" "2.2.2"
+
 "react-devtools-core@4.24.0":
   "integrity" "sha512-Rw7FzYOOzcfyUPaAm9P3g0tFdGqGq2LLiAI+wjYcp6CsF3DeeMrRS3HZAho4s273C29G/DJhx0e8BpRE/QZNGg=="
   "resolved" "https://registry.npmjs.org/react-devtools-core/-/react-devtools-core-4.24.0.tgz"
@@ -6768,6 +6773,11 @@
   "version" "0.14.9"
   dependencies:
     "hoist-non-react-statics" "^2.3.1"
+
+"react-native-scoped-storage@^1.9.3":
+  "integrity" "sha512-hGqj+2I6pIziIh1CmWXXlgm59wCQLIikETqbMCaFQRHC3yQGI4HdYN6QvM3rteUuR69PNjso+Qd3TJfQnFhlMA=="
+  "resolved" "https://registry.npmjs.org/react-native-scoped-storage/-/react-native-scoped-storage-1.9.3.tgz"
+  "version" "1.9.3"
 
 "react-native-screens@^3.17.0", "react-native-screens@>= 3.0.0":
   "integrity" "sha512-OZCQU7+3neHNaM19jBkYRjL50kXz7p7MUgWQTCcdRoshcCiolf8aXs4eRVQKGK6m1RmoB8UL0//m5R9KoR+41w=="

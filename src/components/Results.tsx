@@ -5,8 +5,8 @@ import LocalStorage from '../lib/LocalStorage';
 import Utils from '../lib/Utils';
 import moment from 'moment';
 import EntrantRecordLine from './EntrantRecordLine';
-
-import { CSVLink } from 'react-csv';
+import * as ScopedStorage from 'react-native-scoped-storage';
+import { jsonToCSV } from 'react-native-csv';
 
 const Results = () => {
   const [resultsData, setResultsData] = React.useState([]);
@@ -23,12 +23,23 @@ const Results = () => {
     }
   });
 
-  const exportResults = () => {};
-
   const displayResultsFromLocalContent = () => {
+    console.log(Utils.getRaceKey(currentRace));
     LocalStorage.getResults(Utils.getRaceKey(currentRace))
       .then((results) => {
-        formatResultsTable(JSON.parse(results));
+        console.log(JSON.parse(results));
+        const newContent = formatResults(
+          JSON.parse(results),
+          (extendedEntrantRecord) => {
+            return (
+              <EntrantRecordLine
+                key={extendedEntrantRecord.nfcId}
+                record={extendedEntrantRecord}
+              />
+            );
+          }
+        );
+        setResultsData(newContent);
       })
       .catch((e) => setDebug(e.message));
     // LocalStorage.getResults(Utils.getRaceKey(currentRace)).then( (results) =>
@@ -39,8 +50,8 @@ const Results = () => {
     // }).catch ( (e) => setDebug(e.message));
   };
 
-  const formatResultsTable = (results) => {
-    let tableContent = [];
+  const formatResults = (results, callback) => {
+    let formattedContent = [];
     Object.keys(results).map((key) => {
       return LocalStorage.getEntrant(Utils.getRaceKey(currentRace), key)
         .then((entrantRecordString) => {
@@ -48,29 +59,37 @@ const Results = () => {
           extendedEntrantRecord.finishtime = moment(results[key]).format(
             'HH:mm:ss.S'
           );
-          tableContent.push(
-            <EntrantRecordLine
-              key={extendedEntrantRecord.nfcId}
-              record={extendedEntrantRecord}
-            />
-          );
+          formattedContent.push(callback(extendedEntrantRecord));
+
           //setDebug(JSON.stringify(extendedEntrantRecord));
         })
         .catch((e) => setDebug(e.message));
     });
-    setResultsData(tableContent);
+    return formattedContent;
   };
 
   //   React.useEffect(() => {
   //     displayResultsFromLocalContent();
   //   });
 
-  const csvData = [
-    ['firstname', 'lastname', 'email'],
-    ['Ahmed', 'Tomi', 'ah@smthing.co.com'],
-    ['Raed', 'Labes', 'rl@smthing.co.com'],
-    ['Yezzi', 'Min l3b', 'ymin@cocococo.com'],
-  ];
+  const exportResultsToFile = async () => {
+    const stringResults = await LocalStorage.getResults(
+      Utils.getRaceKey(currentRace)
+    );
+    const resultsJson = JSON.parse(stringResults);
+
+    const csvString = jsonToCSV(resultsJson);
+    console.log(resultsJson);
+    let dir = await ScopedStorage.openDocumentTree(true);
+    //   write the current list of answers to a local csv file
+    const filename = `${currentRace.raceName}_${currentRace.raceDate}.csv`;
+    // pathToWrite /storage/emulated/0/Download/data.csv
+    await ScopedStorage.writeFile(dir.uri, csvString, filename)
+      .then(() => {
+        console.log(`wrote file ${filename}`);
+      })
+      .catch((error) => console.error(error));
+  };
 
   return (
     <View>
@@ -86,10 +105,7 @@ const Results = () => {
       </Text>
       <DataTable>{resultsData}</DataTable>
       <Button title="reload" onPress={() => displayResultsFromLocalContent()} />
-      <View>
-        <CSVLink data={csvData}>Download me</CSVLink>
-      </View>
-
+      <Button title="write to file" onPress={() => exportResultsToFile()} />
     </View>
   );
 };
