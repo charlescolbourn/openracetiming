@@ -24,22 +24,21 @@ const Results = () => {
   });
 
   const displayResultsFromLocalContent = () => {
-    console.log(Utils.getRaceKey(currentRace));
     LocalStorage.getResults(Utils.getRaceKey(currentRace))
       .then((results) => {
-        console.log(JSON.parse(results));
-        const newContent = formatResults(
-          JSON.parse(results),
-          (extendedEntrantRecord) => {
-            return (
-              <EntrantRecordLine
-                key={extendedEntrantRecord.nfcId}
-                record={extendedEntrantRecord}
-              />
-            );
-          }
-        );
-        setResultsData(newContent);
+        formatResults(JSON.parse(results), (extendedEntrantRecord) => {
+          //             console.log(JSON.stringify(extendedEntrantRecord));
+          return (
+            <EntrantRecordLine
+              key={extendedEntrantRecord.nfcId}
+              record={extendedEntrantRecord}
+            />
+          );
+        }).then((newContent) => {
+          console.log('setting resultsData');
+          console.log(newContent);
+          setResultsData(newContent);
+        });
       })
       .catch((e) => setDebug(e.message));
     // LocalStorage.getResults(Utils.getRaceKey(currentRace)).then( (results) =>
@@ -59,13 +58,14 @@ const Results = () => {
           extendedEntrantRecord.finishtime = moment(results[key]).format(
             'HH:mm:ss.S'
           );
+          console.log(extendedEntrantRecord);
           formattedContent.push(callback(extendedEntrantRecord));
 
           //setDebug(JSON.stringify(extendedEntrantRecord));
         })
         .catch((e) => setDebug(e.message));
     });
-    return formattedContent;
+    return Promise.all(formattedContent);
   };
 
   //   React.useEffect(() => {
@@ -76,7 +76,10 @@ const Results = () => {
     const stringResults = await LocalStorage.getResults(
       Utils.getRaceKey(currentRace)
     );
-    const resultsJson = JSON.parse(stringResults);
+    const resultsJson = formatResults(
+      JSON.parse(stringResults),
+      (record) => record
+    );
 
     const csvString = jsonToCSV(resultsJson);
     console.log(resultsJson);
