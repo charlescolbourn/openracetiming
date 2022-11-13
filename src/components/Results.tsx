@@ -50,22 +50,22 @@ const Results = () => {
   };
 
   const formatResults = (results, callback) => {
-    let formattedContent = [];
-    Object.keys(results).map((key) => {
-      return LocalStorage.getEntrant(Utils.getRaceKey(currentRace), key)
-        .then((entrantRecordString) => {
-          let extendedEntrantRecord = JSON.parse(entrantRecordString);
-          extendedEntrantRecord.finishtime = moment(results[key]).format(
-            'HH:mm:ss.S'
-          );
-          console.log(extendedEntrantRecord);
-          formattedContent.push(callback(extendedEntrantRecord));
+    return Promise.all(
+      Object.keys(results).map((key) => {
+        return LocalStorage.getEntrant(Utils.getRaceKey(currentRace), key)
+          .then((entrantRecordString) => {
+            let extendedEntrantRecord = JSON.parse(entrantRecordString);
+            extendedEntrantRecord.finishtime = moment(results[key]).format(
+              'HH:mm:ss.S'
+            );
+            console.log(extendedEntrantRecord);
+            return callback(extendedEntrantRecord);
 
-          //setDebug(JSON.stringify(extendedEntrantRecord));
-        })
-        .catch((e) => setDebug(e.message));
-    });
-    return Promise.all(formattedContent);
+            //setDebug(JSON.stringify(extendedEntrantRecord));
+          })
+          .catch((e) => setDebug(e.message));
+      })
+    );
   };
 
   //   React.useEffect(() => {
@@ -76,20 +76,26 @@ const Results = () => {
     const stringResults = await LocalStorage.getResults(
       Utils.getRaceKey(currentRace)
     );
-    const resultsJson = formatResults(
+    console.log(stringResults);
+    const resultsJson = await formatResults(
       JSON.parse(stringResults),
       (record) => record
     );
+    console.log(JSON.stringify(resultsJson));
 
     const csvString = jsonToCSV(resultsJson);
-    console.log(resultsJson);
+    console.log(csvString);
     let dir = await ScopedStorage.openDocumentTree(true);
     //   write the current list of answers to a local csv file
     const filename = `${currentRace.raceName}_${currentRace.raceDate}.csv`;
     // pathToWrite /storage/emulated/0/Download/data.csv
     await ScopedStorage.writeFile(dir.uri, csvString, filename)
       .then(() => {
-        console.log(`wrote file ${filename}`);
+        console.log(
+          `wrote file ${filename} with content ${csvString} from json ${JSON.stringify(
+            resultsJson
+          )}`
+        );
       })
       .catch((error) => console.error(error));
   };
