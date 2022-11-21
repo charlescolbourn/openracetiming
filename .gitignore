@@ -67,3 +67,5 @@ buck-out/
 
 # eslint cache
 .eslintcache
+
+coverage/

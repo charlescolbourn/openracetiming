@@ -11,6 +11,7 @@ import LocalStorage from '../lib/LocalStorage';
 import Utils from '../lib/Utils';
 
 import EntrantRecordLine from './EntrantRecordLine';
+// import CurrentRaceView from './CurrentRaceView';
 
 const Timing = ({ navigation }) => {
   const [showStarted, setShowStarted] = React.useState(false);
@@ -19,7 +20,8 @@ const Timing = ({ navigation }) => {
   const [displayButtons, setDisplayButtons] = React.useState(false);
   const [finished, setFinished] = React.useState(false);
   const [finishrows, setFinishrows] = React.useState([]);
-  const [currentRace, setCurrentRace] = React.useState([]);
+  const [currentRace, setCurrentRace] = React.useState({});
+  const [debugContent, setDebugContent] = React.useState('');
 
   const initialiseFromLocalStorage = () => {
     //need to handle case where race is finished
@@ -34,14 +36,16 @@ const Timing = ({ navigation }) => {
           }
         }
       })
-      .catch((e) => Alert.alert(JSON.stringify(e)));
+      .catch((e) => setDebugContent(JSON.stringify(e)));
   };
 
-  if (!currentRace) {
-    LocalStorage.getCurrentRace().then((raceDetails) =>
-      setCurrentRace(JSON.parse(raceDetails))
-    );
-  }
+  React.useEffect(() => {
+    if (!currentRace || Object.keys(currentRace).length === 0) {
+      LocalStorage.getCurrentRace().then((raceDetails) => {
+        setCurrentRace(JSON.parse(raceDetails));
+      });
+    }
+  });
 
   const writeTime = (entrantId: string = 'unknown') => {
     const timeNow = Date.now();
@@ -70,10 +74,10 @@ const Timing = ({ navigation }) => {
             ];
             setFinishrows(newFinishrows);
           })
-          .catch((e) => setResultsContent(JSON.stringify(e.message)));
+          .catch((e) => setDebugContent(JSON.stringify(e.message)));
       })
 
-      .catch((e) => Alert.alert(JSON.stringify(e)));
+      .catch((e) => setDebugContent(JSON.stringify(e.message)));
   };
 
   React.useEffect(() => {
@@ -94,7 +98,7 @@ const Timing = ({ navigation }) => {
         }
       });
     };
-    initNfc().catch((e) => Alert.alert(JSON.stringify(e)));
+    initNfc().catch((e) => setDebugContent(e.message));
   });
 
   const startEvent = () => {
@@ -132,11 +136,13 @@ const Timing = ({ navigation }) => {
   return (
     <View>
       <Text>
-        {currentRace
+        {currentRace && Object.keys(currentRace).length > 0
           ? `${currentRace.raceName} ${moment(currentRace.raceDate).format(
               'DD/MM/YYYY'
             )}`
-          : ''}
+          : 'No race selected'}
+
+        {/*                         <CurrentRaceView raceDetails={currentRace}/>   */}
       </Text>
       {showStarted ? (
         <Button
@@ -154,6 +160,7 @@ const Timing = ({ navigation }) => {
       <View>
         <DataTable>{finishrows}</DataTable>
       </View>
+      <Text>{debugContent}</Text>
       <Text>{resultsContent}</Text>
       <Button
         onPress={() => {

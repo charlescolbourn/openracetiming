@@ -25,9 +25,10 @@ v1.4.0 - Observer/results mode. (Possible sls framework API to record times)
 
 ## Next Steps
 
-Create settings page & save settings to local
+Load preimported entrant list when opening 'registration'
 
-Migrate settings from page to modal that appears on start
+refactor display in registration
+
 
 Implement some tests
 
@@ -68,6 +69,14 @@ Link to camera taking photos of finishers to audit finish (trigger camera on pho
 EoD - someone taking details and pushing to the API
 
 Drop downs for category & club
+
+Notification from previous CP when first runners come through
+
+Compile for Desktop RN & test
+
+Just a note: there is a trade off - accurate vs easy. The NFC path is really easy for the 
+ marshalls/RO, but not as accurate as 'click to finish'. The traditional 'click to finish' then
+ reconcile with the race numbers in a funnel is super-accurate, but harder to manage.
 
 ## APIs to implement
 

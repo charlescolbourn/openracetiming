@@ -15,10 +15,12 @@ import {
 import { DataTable } from 'react-native-paper';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import LocalStorage from '../lib/LocalStorage';
+import DeveloperOptions from './DeveloperOptions';
 
 import moment from 'moment';
 
-const Settings = () => {
+const Settings = ({ navigation }) => {
+  const DEVSETTINGS = true;
   const [availableRaces, setAvailableRaces] = React.useState([]);
   const [raceData, setRaceData] = React.useState({ massStart: true });
 
@@ -42,19 +44,27 @@ const Settings = () => {
       .catch((e) => setDebug(JSON.stringify(e.message)));
   };
 
-  React.useEffect(() => initialiseFromLocalStorage());
+  //   React.useEffect(() =>
+  initialiseFromLocalStorage();
+  // );
 
   const selectRace = (raceInfo) => {
     LocalStorage.setCurrentRace(raceInfo);
+    navigation.jumpTo('Registration');
   };
 
   const tabulateRaces = (raceList) => {
     return raceList.map((value) => {
       return (
-        <TouchableOpacity onPress={() => selectRace(value)}>
+        <TouchableOpacity
+          key={value.raceName}
+          onPress={() => selectRace(value)}
+        >
           <DataTable.Row key={value.raceName}>
-            <DataTable.Cell key="name">{value.raceName}</DataTable.Cell>
-            <DataTable.Cell key="date">
+            <DataTable.Cell key={value.raceName}>
+              {value.raceName}
+            </DataTable.Cell>
+            <DataTable.Cell key={value.raceDate}>
               {moment(value.raceDate).format('DD/MM/YYYY')}
             </DataTable.Cell>
           </DataTable.Row>
@@ -129,12 +139,14 @@ const Settings = () => {
         <Text>Select a race or create a new race</Text>
         <DataTable>{availableRaces}</DataTable>
       </View>
-
-      {showNewRaceForm ? (
-        newRaceForm()
-      ) : (
-        <Button onPress={() => setShowNewRaceForm(true)} title="new race" />
-      )}
+      <View>
+        {showNewRaceForm ? (
+          newRaceForm()
+        ) : (
+          <Button onPress={() => setShowNewRaceForm(true)} title="new race" />
+        )}
+      </View>
+      <View>{DEVSETTINGS ? <DeveloperOptions /> : <></>}</View>
     </>
   );
 };
