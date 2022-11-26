@@ -32,9 +32,6 @@ refactor display in registration
 
 Implement some tests
 
-
-Export times to csv - put the save dialogue on the 'finish/results' tab
-
 That's the simplest useable case (entries can be set up with csv)
 
 register race number against entry
