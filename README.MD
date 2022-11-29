@@ -90,3 +90,22 @@ Get results
 
 Upload entries
 
+
+## Multi device p2p support
+
+master device creates race
+
+others have to pull
+
+entries are keyed on nfc id but rename it as unique id to support non-electronic timing
+
+'sync' button that checks for other devices in range and compares dbs.
+
+dialogue to say what dbs to sync (just entries and currently selected race to start with)
+
+First step - find all devices running ORT
+
+assume that we don't write /anything/ for entries with a device id
+
+entry states: entered, registered
+
