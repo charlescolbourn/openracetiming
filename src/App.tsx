@@ -60,6 +60,10 @@ function LogoTitle() {
 const Tab = createBottomTabNavigator();
 
 const App = () => {
+  //     BleManager.start({ showAlert: false }).then(() => {
+  //       // Success code
+  //       console.log("Module initialized");
+  //     });
   return (
     <>
       <NavigationContainer>
