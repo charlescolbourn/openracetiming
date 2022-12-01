@@ -18,6 +18,7 @@ a race, import a csv, time a race and get the results.
 
 
 
+
 ## Roadmap
 
 v1.0.0 - Mass start, NFC scanning at finish. Import of entrant spreadsheet/manually
@@ -36,6 +37,8 @@ v1.4.0 - Observer/results mode. (Possible sls framework API to record times)
 refactor display in registration
 
 Implement more tests
+
+get list of races to update after creating one
 
 Fix babel/jest issue stopping tsx tests working
 
