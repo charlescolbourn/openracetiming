@@ -8,7 +8,7 @@ export default class LocalStorage {
     );
   }
 
-  public static getStartTime(racekey) {
+  public static getStartTime(racekey: string) {
     return AsyncStorage.getItem(`@ORT_starttimes:${racekey}:default`);
   }
 
@@ -62,7 +62,7 @@ export default class LocalStorage {
     AsyncStorage.clear();
   }
 
-  public static addToStarterList(racekey, record) {
+  public static addToStarterList(racekey: string, record: string) {
     return AsyncStorage.setItem(
       `@ORT_entrantsByKey:${racekey}:${record.nfcId}`,
       JSON.stringify(record)
@@ -82,7 +82,7 @@ export default class LocalStorage {
     });
   }
 
-  public static saveRace(raceData) {
+  public static saveRace(raceData: object) {
     const raceKey = `${raceData.raceName}:${raceData.raceDate}`;
 
     return AsyncStorage.setItem(
@@ -104,7 +104,7 @@ export default class LocalStorage {
       .catch((e) => Alert.alert(JSON.stringify(e.message)));
   }
 
-  public static setCurrentRace(raceInfo) {
+  public static setCurrentRace(raceInfo: object) {
     AsyncStorage.setItem('@ORT_currentrace', JSON.stringify(raceInfo));
   }
 
@@ -112,7 +112,7 @@ export default class LocalStorage {
     return AsyncStorage.getItem('@ORT_currentrace');
   }
 
-  public static getResults(raceKey) {
+  public static getResults(raceKey: string) {
     return AsyncStorage.getItem(`@ORT_finishtimes:${raceKey}`);
   }
 
