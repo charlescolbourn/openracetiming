@@ -10,7 +10,14 @@ OpenRaceTiming is intended to be a fully open source race timing system with the
 * Multi device finish/CP scanning
 * Mass start
 * Staggered start
-* 
+
+v1.0.0a (Current) is an alpha version of the functionality described in 1.0.0 below. You can create
+a race, import a csv, time a race and get the results.
+
+## How to use
+
+
+
 
 ## Roadmap
 
@@ -29,7 +36,11 @@ v1.4.0 - Observer/results mode. (Possible sls framework API to record times)
 
 refactor display in registration
 
-Implement some tests
+Implement more tests
+
+get list of races to update after creating one
+
+Fix babel/jest issue stopping tsx tests working
 
 register race number against entry
 
@@ -109,3 +120,4 @@ assume that we don't write /anything/ for entries with a device id
 
 entry states: entered, registered
 
+Bluetooth is a non-starter, can't do phone to phone

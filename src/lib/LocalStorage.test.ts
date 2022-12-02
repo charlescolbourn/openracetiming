@@ -2,6 +2,8 @@
 import LocalStorage from './LocalStorage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const TEST_RACEKEY = 'r4cek3y';
+
 // const mock = () => {
 //   const mockImpl = new MockAsyncStorage()
 //   jest.mock('AsyncStorage', () => mockImpl)
@@ -9,14 +11,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 describe('test timing methods', () => {
   it('check get start time', () => {
-    LocalStorage.getStartTime();
-    expect(AsyncStorage.getItem).toBeCalledWith('@ORT_starttimes:default');
+    LocalStorage.getStartTime(TEST_RACEKEY);
+    expect(AsyncStorage.getItem).toBeCalledWith(
+      `@ORT_starttimes:${TEST_RACEKEY}:default`
+    );
   });
 
   it('check set finish time', () => {
-    LocalStorage.writeFinishTime('12345', 'abcdef');
+    LocalStorage.writeFinishTime(TEST_RACEKEY, 12345, 'abcdef');
     expect(AsyncStorage.setItem).toBeCalledWith(
-      '@ORT_finishtimes:abcdef',
+      `@ORT_finishtimes:${TEST_RACEKEY}:abcdef`,
       '12345'
     );
   });
@@ -24,9 +28,9 @@ describe('test timing methods', () => {
 
 describe('entrant methods', () => {
   it('check get entrant', () => {
-    LocalStorage.getEntrant('badger');
+    LocalStorage.getEntrant(TEST_RACEKEY, 'badger');
     expect(AsyncStorage.getItem).toBeCalledWith(
-      '@ORT_registeredEntrants:badger'
+      `@ORT_registeredEntrants:${TEST_RACEKEY}:badger`
     );
   });
 });
