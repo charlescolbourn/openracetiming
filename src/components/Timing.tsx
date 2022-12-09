@@ -122,17 +122,6 @@ const Timing = ({ navigation }) => {
     navigation.jumpTo('Identify');
   };
 
-  const resetSession = () => {
-    setShowStarted(false);
-    //     setResultsContent('');
-    setFinishrows([]);
-    setStartTime(0);
-    LocalStorage.clear();
-    NfcManager.cancelTechnologyRequest().catch((e) =>
-      Alert.alert(JSON.stringify(e))
-    );
-  };
-
   return (
     <View>
       <Text>
@@ -162,18 +151,12 @@ const Timing = ({ navigation }) => {
       </View>
       <Text>{debugContent}</Text>
       <Text>{resultsContent}</Text>
-      <Button
-        onPress={() => {
-          resetSession();
-        }}
-        title="Reset"
-        // 				disabled={displayButtons} reenable when finish is handled better
-      />
+
       <Button
         onPress={() => {
           finishRace();
         }}
-        disabled={!displayButtons}
+        disabled={!displayButtons || showStarted}
         title="Finish"
       />
     </View>

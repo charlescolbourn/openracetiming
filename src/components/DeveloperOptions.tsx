@@ -4,7 +4,7 @@
 
 import React from 'react';
 
-import { View, Button, Text } from 'react-native';
+import { View, Button, Text, StyleSheet } from 'react-native';
 
 import LocalStorage from '../lib/LocalStorage';
 
@@ -16,6 +16,9 @@ const DeveloperOptions = () => {
       .catch((e) => setDebug(e.message));
   };
 
+  const wipeLocalStorage = () => {
+    LocalStorage.clear();
+  };
   return (
     <>
       <View>
@@ -24,6 +27,18 @@ const DeveloperOptions = () => {
         <Button
           onPress={() => getEverything()}
           title="Get everything from local storage"
+        />
+        <View
+          style={{
+            borderBottomColor: 'black',
+            borderBottomWidth: StyleSheet.hairlineWidth,
+          }}
+        />
+        <Button
+          onPress={() => {
+            wipeLocalStorage();
+          }}
+          title="Wipe all ORT data from local storage"
         />
       </View>
     </>

@@ -12,11 +12,46 @@ OpenRaceTiming is intended to be a fully open source race timing system with the
 * Staggered start
 
 v1.0.0a (Current) is an alpha version of the functionality described in 1.0.0 below. You can create
-a race, import a csv, time a race and get the results.
+a race, import a csv, time a race and get the results. There is embarrassingly little in the way of
+tests.
 
 ## How to use
 
+Step 1: Create a race
 
+In the 'settings' tab you can click on 'new race', then click on 'race name' to enter the race name.
+
+Next click on 'click to set race date' which will bring up a date setting dialogue.
+
+Finally click on 'add race' to add the race to the database.
+
+Step 2: Register entrants
+
+You'll need a csv file with entrants details in. The first two columns are the identifiers so
+make sure they're unique. The output of the race will be this file with 2 new columns.
+
+Choose your file using the 'import csv' button. 'Add Entry' doesn't do anything yet.
+
+Now you'll need to register each entrants nfc tag. Tap on each entrant in turn and present the nfc
+tag to the right place on the phone. It'll make a sound and the tag ID will appear.
+
+Step 3: Start the race
+
+In the 'Timing' tab there is a button to start the race. Once started the button will change to 
+'finish' and grey out. 'Finish' doesn't do anything yet.
+
+As each racer reaches the end, scan their nfc tag with the phone. Their finish time will appear in
+the list on the Timing page.
+
+At any time in the race you can go to 'Results' and refresh the view to see all finishers.
+
+Step 4: output the results
+
+In the 'Results' tab, click on 'write to file' and choose an output location for the results. The 
+app will output your original csv file with 2 new columns - the nfc id and time for each racer.
+
+Note: You can wipe the entire content of the app using 'clear all' in the settings page. This will be
+hidden in later versions, but is available in the prototype.
 
 
 ## Roadmap
@@ -121,3 +156,7 @@ assume that we don't write /anything/ for entries with a device id
 entry states: entered, registered
 
 Bluetooth is a non-starter, can't do phone to phone
+
+-----------------------------------------------------------------------------
+OpenRaceTiming is copyright 2022 C W Colbourn. It is released under the GPLv3.
+Please see the bundled LICENSE.txt for details.
