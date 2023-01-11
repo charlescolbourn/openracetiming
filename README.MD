@@ -12,8 +12,8 @@ OpenRaceTiming is intended to be a fully open source race timing system with the
 * Staggered start
 
 v1.0.0a (Current) is an alpha version of the functionality described in 1.0.0 below. You can create
-a race, import a csv, time a race and get the results. There is embarrassingly little in the way of
-tests.
+a race, import a csv, time a race using NFC tags and get the results. The test suite isn't great, 
+there's a lot more to do there.
 
 ## How to use
 
@@ -27,13 +27,21 @@ Finally click on 'add race' to add the race to the database.
 
 Step 2: Register entrants
 
-You'll need a csv file with entrants details in. The first two columns are the identifiers so
-make sure they're unique. The output of the race will be this file with 2 new columns.
+You'll need a csv file with entrants details in. The first two columns are combined to create 
+the identifier so make sure they combine to make a unique name/string.
+
+The output of the race will be this file with 2 new columns.
 
 Choose your file using the 'import csv' button. 'Add Entry' doesn't do anything yet.
 
 Now you'll need to register each entrants nfc tag. Tap on each entrant in turn and present the nfc
 tag to the right place on the phone. It'll make a sound and the tag ID will appear.
+
+You can buy tags from various places. I used these for testing:
+
+https://www.ebay.co.uk/itm/281868752833
+
+You'll need to run on a device with an NFC reader. Most mobile phones these days support NFC.
 
 Step 3: Start the race
 
