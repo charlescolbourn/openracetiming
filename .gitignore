@@ -69,3 +69,5 @@ buck-out/
 .eslintcache
 
 coverage/
+
+android/app/openracetiming.keystore
