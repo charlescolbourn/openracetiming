@@ -19,6 +19,7 @@ import DeveloperOptions from './DeveloperOptions';
 import { useFocusEffect } from '@react-navigation/native';
 
 import moment from 'moment';
+import styles from '../style/Styles';
 
 const Settings = ({ navigation }) => {
   const DEVSETTINGS = true;
@@ -135,6 +136,7 @@ const Settings = ({ navigation }) => {
         />
 
         <Button
+          color={styles.button.color}
           onPress={() => {
             saveRace();
           }}
@@ -154,7 +156,11 @@ const Settings = ({ navigation }) => {
         {showNewRaceForm ? (
           newRaceForm()
         ) : (
-          <Button onPress={() => setShowNewRaceForm(true)} title="new race" />
+          <Button
+            color={styles.button.color}
+            onPress={() => setShowNewRaceForm(true)}
+            title="new race"
+          />
         )}
       </View>
       <View>{DEVSETTINGS ? <DeveloperOptions /> : <></>}</View>

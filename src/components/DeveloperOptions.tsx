@@ -4,7 +4,8 @@
 
 import React from 'react';
 
-import { View, Button, Text, StyleSheet } from 'react-native';
+import { Alert, View, Button, Text, StyleSheet } from 'react-native';
+import styles from '../style/Styles';
 
 import LocalStorage from '../lib/LocalStorage';
 
@@ -26,6 +27,7 @@ const DeveloperOptions = () => {
 
         <Button
           onPress={() => getEverything()}
+          color={styles.button.color}
           title="Get everything from local storage"
         />
         <View
@@ -35,8 +37,16 @@ const DeveloperOptions = () => {
           }}
         />
         <Button
+          color={styles.danger.color}
           onPress={() => {
-            wipeLocalStorage();
+            Alert.alert('Wipe all app data', 'Are you sure about that?', [
+              { text: 'yes', onPress: () => wipeLocalStorage() },
+              {
+                text: 'no',
+                //onPress: () => return,
+                style: 'cancel',
+              },
+            ]);
           }}
           title="Wipe all ORT data from local storage"
         />
