@@ -30,6 +30,7 @@ const Settings = ({ navigation }) => {
   const [datePickerVisible, setDatePickerVisible] = React.useState(false);
   const [showNewRaceForm, setShowNewRaceForm] = React.useState(false);
   const [debug, setDebug] = React.useState('');
+  const [raceDate, setRaceDate] = 'tap to set date';
 
   const initialiseFromLocalStorage = () => {
     console.log('getting races');
@@ -115,11 +116,7 @@ const Settings = ({ navigation }) => {
         />
 
         <TouchableOpacity onPress={() => setDatePickerVisible(true)}>
-          <Text>
-            {raceData.raceDate
-              ? moment(raceData.raceDate).format('DD/MM/YYYY')
-              : 'Click to set race date'}
-          </Text>
+          <Text>{raceDate}</Text>
         </TouchableOpacity>
         <DateTimePickerModal
           isVisible={datePickerVisible}
@@ -130,6 +127,7 @@ const Settings = ({ navigation }) => {
             //                 setRaceData(thisRace);
             setDatePickerVisible(false);
             updateField('raceDate', date.getTime());
+            setRaceDate(date.getTime());
           }}
           onCancel={() => setDatePickerVisible(false)}
         />
