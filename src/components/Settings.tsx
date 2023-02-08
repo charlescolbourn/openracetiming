@@ -16,12 +16,15 @@ import { DataTable } from 'react-native-paper';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import LocalStorage from '../lib/LocalStorage';
 import DeveloperOptions from './DeveloperOptions';
+import { useFocusEffect } from '@react-navigation/native';
 
 import moment from 'moment';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const Settings = ({ navigation }) => {
   const DEVSETTINGS = true;
-  const [availableRaces, setAvailableRaces] = React.useState([]);
+  const [availableRaces, setAvailableRaces] = React.useState(undefined);
   const [raceData, setRaceData] = React.useState({ massStart: true });
 
   const [datePickerVisible, setDatePickerVisible] = React.useState(false);
@@ -29,6 +32,7 @@ const Settings = ({ navigation }) => {
   const [debug, setDebug] = React.useState('');
 
   const initialiseFromLocalStorage = () => {
+    console.log('getting races');
     LocalStorage.getRaces()
       .then((raceList) => {
         //       setDebug(tabulateRaces(JSON.parse(raceList)));
@@ -39,14 +43,18 @@ const Settings = ({ navigation }) => {
         //           console.log(race);
         //         })
         //  : [];
+        console.log(raceList);
         setAvailableRaces(tabulateRaces(raceList));
       })
       .catch((e) => setDebug(JSON.stringify(e.message)));
+    console.log('ran fetch races');
   };
 
-  //   React.useEffect(() =>
-  initialiseFromLocalStorage();
-  // );
+  useFocusEffect(() => {
+    if (!availableRaces && !showNewRaceForm) {
+      initialiseFromLocalStorage();
+    }
+  });
 
   const selectRace = (raceInfo) => {
     LocalStorage.setCurrentRace(raceInfo);
@@ -74,9 +82,16 @@ const Settings = ({ navigation }) => {
   };
 
   const saveRace = () => {
-    LocalStorage.saveRace(raceData).catch((e) => setDebug(JSON.stringify(e)));
-    setShowNewRaceForm(false);
-    initialiseFromLocalStorage();
+    LocalStorage.saveRace(raceData)
+      .catch((e) => setDebug(JSON.stringify(e.message)))
+      .then(() => {
+        setAvailableRaces(undefined);
+        setShowNewRaceForm(false);
+        AsyncStorage.getItem('@ORT_allraces').then((races) =>
+          console.log(races)
+        );
+      })
+      .catch((e) => setDebug(JSON.stringify(e.message)));
   };
 
   const updateField = (key, value) => {
