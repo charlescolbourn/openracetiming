@@ -20,8 +20,6 @@ import { useFocusEffect } from '@react-navigation/native';
 
 import moment from 'moment';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
 const Settings = ({ navigation }) => {
   const DEVSETTINGS = true;
   const [availableRaces, setAvailableRaces] = React.useState(undefined);
@@ -30,7 +28,7 @@ const Settings = ({ navigation }) => {
   const [datePickerVisible, setDatePickerVisible] = React.useState(false);
   const [showNewRaceForm, setShowNewRaceForm] = React.useState(false);
   const [debug, setDebug] = React.useState('');
-  const [raceDate, setRaceDate] = 'tap to set date';
+  const [raceDate, setRaceDate] = React.useState('tap to set date');
 
   const initialiseFromLocalStorage = () => {
     console.log('getting races');
@@ -91,9 +89,6 @@ const Settings = ({ navigation }) => {
       .then(() => {
         setAvailableRaces(undefined);
         setShowNewRaceForm(false);
-        AsyncStorage.getItem('@ORT_allraces').then((races) =>
-          console.log(races)
-        );
       })
       .catch((e) => setDebug(JSON.stringify(e.message)));
   };
@@ -127,7 +122,7 @@ const Settings = ({ navigation }) => {
             //                 setRaceData(thisRace);
             setDatePickerVisible(false);
             updateField('raceDate', date.getTime());
-            setRaceDate(date.getTime());
+            setRaceDate(moment(date.getTime()).format('DD/MM/YYYY'));
           }}
           onCancel={() => setDatePickerVisible(false)}
         />
