@@ -62,23 +62,26 @@ const Settings = ({ navigation }) => {
   };
 
   const tabulateRaces = (raceList) => {
-    return raceList.map((value) => {
-      return (
-        <TouchableOpacity
-          key={value.raceName}
-          onPress={() => selectRace(value)}
-        >
-          <DataTable.Row key={value.raceName}>
-            <DataTable.Cell key={value.raceName}>
-              {value.raceName}
-            </DataTable.Cell>
-            <DataTable.Cell key={value.raceDate}>
-              {moment(value.raceDate).format('DD/MM/YYYY')}
-            </DataTable.Cell>
-          </DataTable.Row>
-        </TouchableOpacity>
-      );
-    });
+    return (
+      raceList &&
+      raceList.map((value) => {
+        return (
+          <TouchableOpacity
+            key={value.raceName}
+            onPress={() => selectRace(value)}
+          >
+            <DataTable.Row key={value.raceName}>
+              <DataTable.Cell key={value.raceName}>
+                {value.raceName}
+              </DataTable.Cell>
+              <DataTable.Cell key={value.raceDate}>
+                {moment(value.raceDate).format('DD/MM/YYYY')}
+              </DataTable.Cell>
+            </DataTable.Row>
+          </TouchableOpacity>
+        );
+      })
+    );
   };
 
   const saveRace = () => {
