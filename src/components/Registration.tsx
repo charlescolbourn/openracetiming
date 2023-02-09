@@ -14,8 +14,8 @@ import NfcManager, { NfcEvents } from 'react-native-nfc-manager';
 import LocalStorage from '../lib/LocalStorage';
 import Utils from '../lib/Utils';
 import EntrantRecordLine from './EntrantRecordLine';
-import moment from 'moment';
 import styles from '../style/Styles';
+import CurrentRaceView from './CurrentRaceView';
 
 const Registration = () => {
   const [records, setRecords] = React.useState([]);
@@ -100,8 +100,11 @@ const Registration = () => {
   React.useEffect(() => {
     if (!currentRace || Object.keys(currentRace).length === 0) {
       LocalStorage.getCurrentRace().then((raceDetails) => {
-        setCurrentRace(JSON.parse(raceDetails));
-        populateExistingEntryList(JSON.parse(raceDetails));
+        console.log(raceDetails);
+        if (raceDetails) {
+          setCurrentRace(JSON.parse(raceDetails));
+          populateExistingEntryList(JSON.parse(raceDetails));
+        }
       });
     }
   });
@@ -155,15 +158,7 @@ const Registration = () => {
   return (
     <View>
       <Text>{debug}</Text>
-      <Text style={styles.SelectedRace}>
-        {currentRace && Object.keys(currentRace).length > 0
-          ? `${currentRace.raceName} ${moment(currentRace.raceDate).format(
-              'DD/MM/YYYY'
-            )}`
-          : 'No race selected'}
-
-        {/*                         <CurrentRaceView raceDetails={currentRace}/>   */}
-      </Text>
+      <CurrentRaceView raceDetails={currentRace} />
       <View>
         <Text>
           <Button

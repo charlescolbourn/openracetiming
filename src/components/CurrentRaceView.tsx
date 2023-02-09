@@ -1,11 +1,11 @@
-import React, { FC, Text } from 'react';
+import React, { FC } from 'react';
 import moment from 'moment';
-
+import { Text } from 'react-native';
 type CurrentRaceProps = {
   raceDetails: object;
 };
 
-const CurrentRaceView: FC<CurrentRaceProps> = ({ raceDetails = false }) => {
+const CurrentRaceView: FC<CurrentRaceProps> = ({ raceDetails }) => {
   return (
     <Text>
       {Object.keys(raceDetails).length > 0

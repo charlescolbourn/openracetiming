@@ -8,6 +8,7 @@ import EntrantRecordLine from './EntrantRecordLine';
 import * as ScopedStorage from 'react-native-scoped-storage';
 import { jsonToCSV } from 'react-native-csv';
 import styles from '../style/Styles';
+import CurrentRaceView from './CurrentRaceView';
 
 const Results = () => {
   const [resultsData, setResultsData] = React.useState([]);
@@ -18,7 +19,9 @@ const Results = () => {
     if (!currentRace || Object.keys(currentRace).length === 0) {
       LocalStorage.getCurrentRace()
         .then((raceDetails) => {
-          setCurrentRace(JSON.parse(raceDetails));
+          if (raceDetails) {
+            setCurrentRace(JSON.parse(raceDetails));
+          }
         })
         .catch((e) => setDebug(e.message));
     }
@@ -28,7 +31,6 @@ const Results = () => {
     LocalStorage.getResults(Utils.getRaceKey(currentRace))
       .then((results) => {
         formatResults(JSON.parse(results), (extendedEntrantRecord) => {
-          //             console.log(JSON.stringify(extendedEntrantRecord));
           return (
             <EntrantRecordLine
               key={extendedEntrantRecord.nfcId}
@@ -69,10 +71,6 @@ const Results = () => {
     );
   };
 
-  //   React.useEffect(() => {
-  //     displayResultsFromLocalContent();
-  //   });
-
   const exportResultsToFile = async () => {
     const stringResults = await LocalStorage.getResults(
       Utils.getRaceKey(currentRace)
@@ -104,15 +102,7 @@ const Results = () => {
   return (
     <View>
       <Text>{debug}</Text>
-      <Text>
-        {currentRace && Object.keys(currentRace).length > 0
-          ? `${currentRace.raceName} ${moment(currentRace.raceDate).format(
-              'DD/MM/YYYY'
-            )}`
-          : 'No race selected'}
-
-        {/*                         <CurrentRaceView raceDetails={currentRace}/>   */}
-      </Text>
+      <CurrentRaceView raceDetails={currentRace} />
       <DataTable>{resultsData}</DataTable>
       <Button
         color={styles.button.color}
