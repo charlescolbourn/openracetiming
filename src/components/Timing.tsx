@@ -9,6 +9,7 @@ import { DataTable } from 'react-native-paper';
 import moment from 'moment';
 import LocalStorage from '../lib/LocalStorage';
 import Utils from '../lib/Utils';
+import styles from '../style/Styles';
 
 import EntrantRecordLine from './EntrantRecordLine';
 // import CurrentRaceView from './CurrentRaceView';
@@ -135,6 +136,7 @@ const Timing = ({ navigation }) => {
       </Text>
       {showStarted ? (
         <Button
+          color={styles.button.color}
           onPress={() => {
             writeTime();
           }}

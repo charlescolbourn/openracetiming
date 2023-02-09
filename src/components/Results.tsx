@@ -7,6 +7,7 @@ import moment from 'moment';
 import EntrantRecordLine from './EntrantRecordLine';
 import * as ScopedStorage from 'react-native-scoped-storage';
 import { jsonToCSV } from 'react-native-csv';
+import styles from '../style/Styles';
 
 const Results = () => {
   const [resultsData, setResultsData] = React.useState([]);
@@ -113,8 +114,16 @@ const Results = () => {
         {/*                         <CurrentRaceView raceDetails={currentRace}/>   */}
       </Text>
       <DataTable>{resultsData}</DataTable>
-      <Button title="reload" onPress={() => displayResultsFromLocalContent()} />
-      <Button title="write to file" onPress={() => exportResultsToFile()} />
+      <Button
+        color={styles.button.color}
+        title="reload"
+        onPress={() => displayResultsFromLocalContent()}
+      />
+      <Button
+        color={styles.button.color}
+        title="write to file"
+        onPress={() => exportResultsToFile()}
+      />
     </View>
   );
 };

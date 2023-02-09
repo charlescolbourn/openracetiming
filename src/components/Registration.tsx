@@ -15,6 +15,7 @@ import LocalStorage from '../lib/LocalStorage';
 import Utils from '../lib/Utils';
 import EntrantRecordLine from './EntrantRecordLine';
 import moment from 'moment';
+import styles from '../style/Styles';
 
 const Registration = () => {
   const [records, setRecords] = React.useState([]);
@@ -215,7 +216,7 @@ const Registration = () => {
           {!displaySaveButton ? (
             <Button
               title="Add entry"
-              color="#e69138ff"
+              color={styles.button.color}
               disabled={true}
               onPress={() => {
                 setAddOrEdit(true);
