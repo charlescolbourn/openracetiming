@@ -139,7 +139,11 @@ const Timing = ({ navigation }) => {
           disabled={showStarted}
         />
       ) : (
-        <Button onPress={() => startEvent()} title="Start" />
+        <Button
+          color={styles.button.color}
+          onPress={() => startEvent()}
+          title="Start"
+        />
       )}
 
       <Text>{startTime ? new Date(startTime).toLocaleString() : ''}</Text>
