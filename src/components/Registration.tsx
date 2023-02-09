@@ -155,7 +155,7 @@ const Registration = () => {
   return (
     <View>
       <Text>{debug}</Text>
-      <Text>
+      <Text style={styles.SelectedRace}>
         {currentRace && Object.keys(currentRace).length > 0
           ? `${currentRace.raceName} ${moment(currentRace.raceDate).format(
               'DD/MM/YYYY'

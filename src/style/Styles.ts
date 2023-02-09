@@ -15,4 +15,8 @@ export default StyleSheet.create({
   danger: {
     color: 'red',
   },
+  SelectedRace: {
+    fontSize: 20,
+    padding: 10,
+  },
 });
