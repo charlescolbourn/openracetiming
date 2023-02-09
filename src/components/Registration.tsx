@@ -177,7 +177,7 @@ const Registration = () => {
                 const data = await file.text(); //JSON.stringify(file);
 
                 setRecords(parseCSV(data));
-                populateEntryTable();
+                populateEntryTable(records);
               } catch (e) {
                 setStatusMessage('ERROR:' + e.message);
               }
