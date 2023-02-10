@@ -13,4 +13,7 @@ export default StyleSheet.create({
     //     backgroundColor: '#FFFFBE',
     backgroundColor: '#D4BFBF',
   },
+  SelectedRaceLabel: {
+    fontWeight: 'bold',
+  },
 });

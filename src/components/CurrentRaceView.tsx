@@ -9,7 +9,7 @@ type CurrentRaceProps = {
 const CurrentRaceView: FC<CurrentRaceProps> = ({ raceDetails }) => {
   return (
     <Text style={styles.SelectedRace}>
-      Selected Race:
+      <Text style={styles.SelectedRaceLabel}>Selected Race: </Text>
       {Object.keys(raceDetails).length > 0
         ? `${raceDetails.raceName} ${moment(raceDetails.raceDate).format(
             'DD/MM/YYYY'
