@@ -16,6 +16,7 @@ import Utils from '../lib/Utils';
 import EntrantRecordLine from './EntrantRecordLine';
 import styles from '../style/Styles';
 import CurrentRaceView from './CurrentRaceView';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Registration = () => {
   const [records, setRecords] = React.useState([]);
@@ -97,7 +98,7 @@ const Registration = () => {
     initNfc().catch((e) => Alert.alert(JSON.stringify(e)));
   });
 
-  React.useEffect(() => {
+  useFocusEffect(() => {
     if (!currentRace || Object.keys(currentRace).length === 0) {
       LocalStorage.getCurrentRace().then((raceDetails) => {
         console.log(raceDetails);
