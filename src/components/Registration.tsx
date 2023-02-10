@@ -157,8 +157,8 @@ const Registration = () => {
 
   return (
     <View>
-      <Text>{debug}</Text>
       <CurrentRaceView raceDetails={currentRace} />
+      <Text>{debug}</Text>
       <View>
         <Text>
           <Button
