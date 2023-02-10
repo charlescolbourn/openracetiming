@@ -9,6 +9,8 @@ import { DataTable } from 'react-native-paper';
 import moment from 'moment';
 import LocalStorage from '../lib/LocalStorage';
 import Utils from '../lib/Utils';
+import styles from '../style/Styles';
+import CurrentRaceView from './CurrentRaceView';
 
 import EntrantRecordLine from './EntrantRecordLine';
 // import CurrentRaceView from './CurrentRaceView';
@@ -42,7 +44,9 @@ const Timing = ({ navigation }) => {
   React.useEffect(() => {
     if (!currentRace || Object.keys(currentRace).length === 0) {
       LocalStorage.getCurrentRace().then((raceDetails) => {
-        setCurrentRace(JSON.parse(raceDetails));
+        if (raceDetails) {
+          setCurrentRace(JSON.parse(raceDetails));
+        }
       });
     }
   });
@@ -124,17 +128,10 @@ const Timing = ({ navigation }) => {
 
   return (
     <View>
-      <Text>
-        {currentRace && Object.keys(currentRace).length > 0
-          ? `${currentRace.raceName} ${moment(currentRace.raceDate).format(
-              'DD/MM/YYYY'
-            )}`
-          : 'No race selected'}
-
-        {/*                         <CurrentRaceView raceDetails={currentRace}/>   */}
-      </Text>
+      <CurrentRaceView raceDetails={currentRace} />
       {showStarted ? (
         <Button
+          color={styles.button.color}
           onPress={() => {
             writeTime();
           }}
@@ -142,7 +139,11 @@ const Timing = ({ navigation }) => {
           disabled={showStarted}
         />
       ) : (
-        <Button onPress={() => startEvent()} title="Start" />
+        <Button
+          color={styles.button.color}
+          onPress={() => startEvent()}
+          title="Start"
+        />
       )}
 
       <Text>{startTime ? new Date(startTime).toLocaleString() : ''}</Text>

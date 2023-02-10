@@ -16,19 +16,23 @@ import { DataTable } from 'react-native-paper';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import LocalStorage from '../lib/LocalStorage';
 import DeveloperOptions from './DeveloperOptions';
+import { useFocusEffect } from '@react-navigation/native';
 
 import moment from 'moment';
+import styles from '../style/Styles';
 
 const Settings = ({ navigation }) => {
   const DEVSETTINGS = true;
-  const [availableRaces, setAvailableRaces] = React.useState([]);
+  const [availableRaces, setAvailableRaces] = React.useState(undefined);
   const [raceData, setRaceData] = React.useState({ massStart: true });
 
   const [datePickerVisible, setDatePickerVisible] = React.useState(false);
   const [showNewRaceForm, setShowNewRaceForm] = React.useState(false);
   const [debug, setDebug] = React.useState('');
+  const [raceDate, setRaceDate] = React.useState('tap to set date');
 
   const initialiseFromLocalStorage = () => {
+    console.log('getting races');
     LocalStorage.getRaces()
       .then((raceList) => {
         //       setDebug(tabulateRaces(JSON.parse(raceList)));
@@ -39,14 +43,18 @@ const Settings = ({ navigation }) => {
         //           console.log(race);
         //         })
         //  : [];
+        console.log(raceList);
         setAvailableRaces(tabulateRaces(raceList));
       })
       .catch((e) => setDebug(JSON.stringify(e.message)));
+    console.log('ran fetch races');
   };
 
-  //   React.useEffect(() =>
-  initialiseFromLocalStorage();
-  // );
+  useFocusEffect(() => {
+    if (!availableRaces && !showNewRaceForm) {
+      initialiseFromLocalStorage();
+    }
+  });
 
   const selectRace = (raceInfo) => {
     LocalStorage.setCurrentRace(raceInfo);
@@ -54,29 +62,36 @@ const Settings = ({ navigation }) => {
   };
 
   const tabulateRaces = (raceList) => {
-    return raceList.map((value) => {
-      return (
-        <TouchableOpacity
-          key={value.raceName}
-          onPress={() => selectRace(value)}
-        >
-          <DataTable.Row key={value.raceName}>
-            <DataTable.Cell key={value.raceName}>
-              {value.raceName}
-            </DataTable.Cell>
-            <DataTable.Cell key={value.raceDate}>
-              {moment(value.raceDate).format('DD/MM/YYYY')}
-            </DataTable.Cell>
-          </DataTable.Row>
-        </TouchableOpacity>
-      );
-    });
+    return (
+      raceList &&
+      raceList.map((value) => {
+        return (
+          <TouchableOpacity
+            key={value.raceName}
+            onPress={() => selectRace(value)}
+          >
+            <DataTable.Row key={value.raceName}>
+              <DataTable.Cell key={value.raceName}>
+                {value.raceName}
+              </DataTable.Cell>
+              <DataTable.Cell key={value.raceDate}>
+                {moment(value.raceDate).format('DD/MM/YYYY')}
+              </DataTable.Cell>
+            </DataTable.Row>
+          </TouchableOpacity>
+        );
+      })
+    );
   };
 
   const saveRace = () => {
-    LocalStorage.saveRace(raceData).catch((e) => setDebug(JSON.stringify(e)));
-    setShowNewRaceForm(false);
-    initialiseFromLocalStorage();
+    LocalStorage.saveRace(raceData)
+      .catch((e) => setDebug(JSON.stringify(e.message)))
+      .then(() => {
+        setAvailableRaces(undefined);
+        setShowNewRaceForm(false);
+      })
+      .catch((e) => setDebug(JSON.stringify(e.message)));
   };
 
   const updateField = (key, value) => {
@@ -97,11 +112,7 @@ const Settings = ({ navigation }) => {
         />
 
         <TouchableOpacity onPress={() => setDatePickerVisible(true)}>
-          <Text>
-            {raceData.raceDate
-              ? moment(raceData.raceDate).format('DD/MM/YYYY')
-              : 'Click to set race date'}
-          </Text>
+          <Text>{raceDate}</Text>
         </TouchableOpacity>
         <DateTimePickerModal
           isVisible={datePickerVisible}
@@ -112,6 +123,7 @@ const Settings = ({ navigation }) => {
             //                 setRaceData(thisRace);
             setDatePickerVisible(false);
             updateField('raceDate', date.getTime());
+            setRaceDate(moment(date.getTime()).format('DD/MM/YYYY'));
           }}
           onCancel={() => setDatePickerVisible(false)}
         />
@@ -124,6 +136,7 @@ const Settings = ({ navigation }) => {
         />
 
         <Button
+          color={styles.button.color}
           onPress={() => {
             saveRace();
           }}
@@ -143,7 +156,11 @@ const Settings = ({ navigation }) => {
         {showNewRaceForm ? (
           newRaceForm()
         ) : (
-          <Button onPress={() => setShowNewRaceForm(true)} title="new race" />
+          <Button
+            color={styles.button.color}
+            onPress={() => setShowNewRaceForm(true)}
+            title="new race"
+          />
         )}
       </View>
       <View>{DEVSETTINGS ? <DeveloperOptions /> : <></>}</View>

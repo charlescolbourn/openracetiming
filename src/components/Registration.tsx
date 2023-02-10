@@ -14,7 +14,8 @@ import NfcManager, { NfcEvents } from 'react-native-nfc-manager';
 import LocalStorage from '../lib/LocalStorage';
 import Utils from '../lib/Utils';
 import EntrantRecordLine from './EntrantRecordLine';
-import moment from 'moment';
+import styles from '../style/Styles';
+import CurrentRaceView from './CurrentRaceView';
 
 const Registration = () => {
   const [records, setRecords] = React.useState([]);
@@ -99,8 +100,11 @@ const Registration = () => {
   React.useEffect(() => {
     if (!currentRace || Object.keys(currentRace).length === 0) {
       LocalStorage.getCurrentRace().then((raceDetails) => {
-        setCurrentRace(JSON.parse(raceDetails));
-        populateExistingEntryList(JSON.parse(raceDetails));
+        console.log(raceDetails);
+        if (raceDetails) {
+          setCurrentRace(JSON.parse(raceDetails));
+          populateExistingEntryList(JSON.parse(raceDetails));
+        }
       });
     }
   });
@@ -153,16 +157,8 @@ const Registration = () => {
 
   return (
     <View>
+      <CurrentRaceView raceDetails={currentRace} />
       <Text>{debug}</Text>
-      <Text>
-        {currentRace && Object.keys(currentRace).length > 0
-          ? `${currentRace.raceName} ${moment(currentRace.raceDate).format(
-              'DD/MM/YYYY'
-            )}`
-          : 'No race selected'}
-
-        {/*                         <CurrentRaceView raceDetails={currentRace}/>   */}
-      </Text>
       <View>
         <Text>
           <Button
@@ -177,7 +173,7 @@ const Registration = () => {
                 const data = await file.text(); //JSON.stringify(file);
 
                 setRecords(parseCSV(data));
-                populateEntryTable();
+                populateEntryTable(records);
               } catch (e) {
                 setStatusMessage('ERROR:' + e.message);
               }
@@ -215,7 +211,7 @@ const Registration = () => {
           {!displaySaveButton ? (
             <Button
               title="Add entry"
-              color="#e69138ff"
+              color={styles.button.color}
               disabled={true}
               onPress={() => {
                 setAddOrEdit(true);
