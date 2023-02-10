@@ -108,6 +108,9 @@ const Registration = () => {
         }
       });
     }
+    if (records && !tableContent) {
+      populateEntryTable(records);
+    }
   });
 
   const populateExistingEntryList = (raceDetails) => {
