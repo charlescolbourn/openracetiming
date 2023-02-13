@@ -108,10 +108,6 @@ const Registration = () => {
         }
       });
     }
-    //     if (records && !tableContent) {
-    //     console.log({records: records});
-    //       populateEntryTable(records);
-    //     }
   });
   // consistently populates the table on the SECOND load of the csv file. So something somewhere in state is broken
 
@@ -151,17 +147,6 @@ const Registration = () => {
     });
   });
 
-  //   const populateEntryTable = (entrants) => {
-  //   console.log({entrants: entrants});
-  //     setTableContent(
-  //       <>
-  //         {entrants.length > 0 ? headerLine(Object.keys(entrants[0])) : ''}
-  //         {entrants.length > 0
-  //           ? entrants.map((record, index) => rowsLine(index, record))
-  //           : ''}
-  //       </>
-  //     );
-  //   };
   const populateEntryTable = (entrants) => {
     return (
       <>
@@ -189,11 +174,7 @@ const Registration = () => {
                 });
                 const file = await fetch(response[0].uri);
                 const data = await file.text(); //JSON.stringify(file);
-                console.log;
                 setRecords(parseCSV(data));
-                //                 console.log(records);
-                //                 populateEntryTable(records);
-                //                 console.log(tableContent);
               } catch (e) {
                 setStatusMessage('ERROR:' + e.message);
               }
