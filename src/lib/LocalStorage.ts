@@ -69,51 +69,11 @@ export default class LocalStorage {
     );
   }
 
-  //   public static getRaces() {
-  //     return AsyncStorage.getItem('@ORT_allraces').then((raceList) => {
-  //       console.log(raceList);
-  //       const raceListArray = raceList ? JSON.parse(raceList) : [];
-  //       console.log({'list':raceListArray});
-  //       return raceList
-  //         ? AsyncStorage.multiGet(
-  //             raceListArray.map((key) => `@ORT_racedetails:${key}`)
-  //           ).then((arr) => {
-  //             return arr.map((key) => JSON.parse(key[1]));
-  //           })
-  //         : new Promise(() => []);
-  //     });
-  //   }
-
   public static getRaces() {
     return AsyncStorage.getItem('@ORT_allraces').then((content) =>
       JSON.parse(content)
     );
   }
-
-  //   public static saveRace(raceData: object) {
-  //     const raceKey = `${raceData.raceName}:${raceData.raceDate}`;
-  //
-  //     return Promise.all(AsyncStorage.setItem(
-  //       `@ORT_racedetails:${raceKey}`,
-  //       JSON.stringify(raceData)
-  //     )
-  //       .then(() => {
-  //         return AsyncStorage.getItem('@ORT_allraces')
-  //           .then((races) => {
-  //             let raceArray = races ? JSON.parse(races) : [];
-  //             raceArray.push(raceKey);
-  //             const ret =  AsyncStorage.setItem(
-  //               '@ORT_allraces',
-  //               JSON.stringify(raceArray)
-  //
-  //
-  //             ).catch((e) => Alert.alert(e.message));
-  //             return ret;
-  //           })
-  //           .catch((e) => Alert.alert(JSON.stringify(e.message)));
-  //       })
-  //       .catch((e) => Alert.alert(JSON.stringify(e.message))));
-  //   }
 
   public static saveRace(raceData: object) {
     const raceKey = `${raceData.raceName}:${raceData.raceDate}`;
