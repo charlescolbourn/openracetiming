@@ -11,6 +11,7 @@ import LocalStorage from '../lib/LocalStorage';
 import Utils from '../lib/Utils';
 import styles from '../style/Styles';
 import CurrentRaceView from './CurrentRaceView';
+import { useFocusEffect } from '@react-navigation/native';
 
 import EntrantRecordLine from './EntrantRecordLine';
 // import CurrentRaceView from './CurrentRaceView';
@@ -41,7 +42,7 @@ const Timing = ({ navigation }) => {
       .catch((e) => setDebugContent(JSON.stringify(e)));
   };
 
-  React.useEffect(() => {
+  useFocusEffect(() => {
     if (!currentRace || Object.keys(currentRace).length === 0) {
       LocalStorage.getCurrentRace().then((raceDetails) => {
         if (raceDetails) {

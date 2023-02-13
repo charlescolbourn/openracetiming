@@ -16,6 +16,7 @@ import Utils from '../lib/Utils';
 import EntrantRecordLine from './EntrantRecordLine';
 import styles from '../style/Styles';
 import CurrentRaceView from './CurrentRaceView';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Registration = () => {
   const [records, setRecords] = React.useState([]);
@@ -30,7 +31,7 @@ const Registration = () => {
   const [nfcRegistered, setNfcRegistered] = React.useState(false);
   const [currentRace, setCurrentRace] = React.useState({});
   const [debug, setDebug] = React.useState('');
-  const [tableContent, setTableContent] = React.useState('');
+  //   const [tableContent, setTableContent] = React.useState('');
 
   const parseCSV = (data) => {
     const results = readString(data, { header: true, skipEmptyLines: true });
@@ -97,7 +98,7 @@ const Registration = () => {
     initNfc().catch((e) => Alert.alert(JSON.stringify(e)));
   });
 
-  React.useEffect(() => {
+  useFocusEffect(() => {
     if (!currentRace || Object.keys(currentRace).length === 0) {
       LocalStorage.getCurrentRace().then((raceDetails) => {
         console.log(raceDetails);
@@ -108,6 +109,7 @@ const Registration = () => {
       });
     }
   });
+  // consistently populates the table on the SECOND load of the csv file. So something somewhere in state is broken
 
   const populateExistingEntryList = (raceDetails) => {
     LocalStorage.getAllEntrants(Utils.getRaceKey(raceDetails))
@@ -115,9 +117,10 @@ const Registration = () => {
         const parsedEntrants = entrants
           .filter((entrant) => entrant)
           .map((entrant) => JSON.parse(entrant));
-        setRecords(parsedEntrants);
-        //         setDebug(JSON.stringify(parsedEntrants));
-        populateEntryTable(parsedEntrants);
+        setRecords(...records, parsedEntrants);
+        console.log({ parsedEntrants: parsedEntrants });
+
+        populateEntryTable(...records, parsedEntrants);
       })
       .catch((e) => setDebug(e.message));
   };
@@ -144,8 +147,8 @@ const Registration = () => {
     });
   });
 
-  const populateEntryTable = (entrants = records) => {
-    setTableContent(
+  const populateEntryTable = (entrants) => {
+    return (
       <>
         {entrants.length > 0 ? headerLine(Object.keys(entrants[0])) : ''}
         {entrants.length > 0
@@ -171,9 +174,7 @@ const Registration = () => {
                 });
                 const file = await fetch(response[0].uri);
                 const data = await file.text(); //JSON.stringify(file);
-
                 setRecords(parseCSV(data));
-                populateEntryTable(records);
               } catch (e) {
                 setStatusMessage('ERROR:' + e.message);
               }
@@ -182,7 +183,7 @@ const Registration = () => {
         </Text>
       </View>
       <View>
-        <DataTable>{tableContent}</DataTable>
+        <DataTable>{records && populateEntryTable(records)}</DataTable>
       </View>
       {addOrEdit ? (
         <View backgroundColor="#AAAAAAAA">
