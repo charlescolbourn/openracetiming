@@ -77,11 +77,9 @@ v1.4.0 - Observer/results mode. (Possible sls framework API to record times)
 
 ## Next Steps
 
-refactor display in registration
 
 Implement more tests
 
-get list of races to update after creating one
 
 Fix babel/jest issue stopping tsx tests working
 
@@ -127,6 +125,10 @@ Just a note: there is a trade off - accurate vs easy. The NFC path is really eas
  reconcile with the race numbers in a funnel is super-accurate, but harder to manage.
 
 OCR based EoD
+
+Workflow for next version: include 'record a finish' button, if a finish is recorded without an nfc, tap on it then present to assign nfc. include undo button.
+That makes it possible to do single device tap-to-finish /and/ scan ID.
+Workflow multi-device: multiple registrations, all reconcile to one. One device records start, pushes to others. All record finish, push to one before output.
 
 ## APIs to implement
 
