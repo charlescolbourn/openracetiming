@@ -119,7 +119,6 @@ const Registration = () => {
           .filter((entrant) => entrant)
           .map((entrant) => JSON.parse(entrant));
         setRecords(...records, parsedEntrants);
-
         populateEntryTable(...records, parsedEntrants);
       })
       .catch((e) => setDebug(e.message));
