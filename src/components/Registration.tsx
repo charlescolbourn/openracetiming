@@ -181,7 +181,6 @@ const Registration = () => {
           />
         </Text>
       </View>
-
       <ScrollView>
         <View>
           <DataTable>{records && populateEntryTable(records)}</DataTable>
