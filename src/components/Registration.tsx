@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {
   View,
+  ScrollView,
   Text,
   Button,
   TextInput,
@@ -118,8 +119,6 @@ const Registration = () => {
           .filter((entrant) => entrant)
           .map((entrant) => JSON.parse(entrant));
         setRecords(...records, parsedEntrants);
-        console.log({ parsedEntrants: parsedEntrants });
-
         populateEntryTable(...records, parsedEntrants);
       })
       .catch((e) => setDebug(e.message));
@@ -182,79 +181,83 @@ const Registration = () => {
           />
         </Text>
       </View>
-      <View>
-        <DataTable>{records && populateEntryTable(records)}</DataTable>
-      </View>
-      {addOrEdit ? (
-        <View backgroundColor="#AAAAAAAA">
-          {Object.keys(entryData).length > 0
-            ? Object.keys(entryData).map((key) =>
-                entryForm(key, entryData[key])
-              )
-            : ''}
-          {/*<TextInput
+
+      <ScrollView>
+        <View>
+          <DataTable>{records && populateEntryTable(records)}</DataTable>
+        </View>
+        {addOrEdit ? (
+          <View style={styles.RegisterEntryBox}>
+            {Object.keys(entryData).length > 0
+              ? Object.keys(entryData).map((key) =>
+                  entryForm(key, entryData[key])
+                )
+              : ''}
+            {/*<TextInput
             placeholder="Race number"
             value={raceNumber}
             onChangeText={setRaceNumber}
           />*/}
+            <Text>
+              {nfcRegistered
+                ? entryData.nfcId
+                : 'Electronic timing chip not yet registered'}
+            </Text>
+          </View>
+        ) : (
+          ''
+        )}
+
+        <View>
           <Text>
-            {nfcRegistered
-              ? entryData.nfcId
-              : 'Electronic timing chip not yet registered'}
+            {!displaySaveButton ? (
+              <Button
+                title="Add entry"
+                color={styles.button.color}
+                disabled={true}
+                onPress={() => {
+                  setAddOrEdit(true);
+                  const entryObject = defaultEntryFields.reduce(
+                    (o, key) => Object.assign(o, { [key]: '' }),
+                    {}
+                  );
+                  setEntryData(entryObject);
+                  setDisplaySaveButton(true);
+                }}
+              />
+            ) : (
+              ''
+            )}
+
+            {displaySaveButton && false ? (
+              <Button
+                title="Save"
+                disabled={true}
+                color="#e69138ff"
+                onPress={async () => {}}
+              />
+            ) : (
+              ''
+            )}
+            {displaySaveButton && false ? (
+              <Button
+                title="Cancel"
+                color="#e69138ff"
+                disabled={true}
+                onPress={async () => {
+                  setAddOrEdit(false);
+                  setEntryData([]);
+                  setDisplaySaveButton(false);
+                }}
+              />
+            ) : (
+              ''
+            )}
           </Text>
         </View>
-      ) : (
-        ''
-      )}
 
-      <View>
-        <Text>
-          {!displaySaveButton ? (
-            <Button
-              title="Add entry"
-              color={styles.button.color}
-              disabled={true}
-              onPress={() => {
-                setAddOrEdit(true);
-                const entryObject = defaultEntryFields.reduce(
-                  (o, key) => Object.assign(o, { [key]: '' }),
-                  {}
-                );
-                setEntryData(entryObject);
-                setDisplaySaveButton(true);
-              }}
-            />
-          ) : (
-            ''
-          )}
-
-          {displaySaveButton && false ? (
-            <Button
-              title="Save"
-              disabled={true}
-              color="#e69138ff"
-              onPress={async () => {}}
-            />
-          ) : (
-            ''
-          )}
-          {displaySaveButton && false ? (
-            <Button
-              title="Cancel"
-              color="#e69138ff"
-              disabled={true}
-              onPress={async () => {
-                setAddOrEdit(false);
-                setEntryData([]);
-                setDisplaySaveButton(false);
-              }}
-            />
-          ) : (
-            ''
-          )}
-        </Text>
-      </View>
-      <Text>{statusMessage}</Text>
+        <Text>{statusMessage}</Text>
+      </ScrollView>
     </View>
   );
 };

@@ -16,4 +16,13 @@ export default StyleSheet.create({
   SelectedRaceLabel: {
     fontWeight: 'bold',
   },
+  RegisterEntryBox: {
+    backgroundColor: '#AAAAAAAA',
+  },
+  EntrantRecordLine: {
+    fontWeight: 'normal',
+    registered: {
+      fontWeight: 'bold',
+    },
+  },
 });
