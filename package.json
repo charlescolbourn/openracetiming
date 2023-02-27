@@ -61,7 +61,7 @@
     "typescript": "^4.4.4"
   },
   "jest": {
-    "preset": "ts-jest",
+    "preset": "react-native",
     "moduleFileExtensions": [
       "ts",
       "tsx",
@@ -69,7 +69,10 @@
       "jsx",
       "json",
       "node"
-    ]
+    ],"transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native(-.*)?|@react-native(-community)?)|@react-navigation(.*)/)"
+    ],
+    "setupFilesAfterEnv": ["./jest.setup.js"]
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --cache --fix",
