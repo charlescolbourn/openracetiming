@@ -4,7 +4,7 @@
 
 import React from 'react';
 import NfcManager, { NfcEvents } from 'react-native-nfc-manager';
-import { Text, View, Button, Alert } from 'react-native';
+import { Text, View, Button, TouchableOpacity } from 'react-native';
 import { DataTable } from 'react-native-paper';
 import moment from 'moment';
 import LocalStorage from '../lib/LocalStorage';
@@ -16,15 +16,14 @@ import { useFocusEffect } from '@react-navigation/native';
 import EntrantRecordLine from './EntrantRecordLine';
 // import CurrentRaceView from './CurrentRaceView';
 
-const Timing = ({ navigation }) => {
+const Timing = () => {
   const [showStarted, setShowStarted] = React.useState(false);
   const [startTime, setStartTime] = React.useState(0);
   const [resultsContent, setResultsContent] = React.useState('');
-  const [displayButtons, setDisplayButtons] = React.useState(false);
-  const [finished, setFinished] = React.useState(false);
   const [finishrows, setFinishrows] = React.useState([]);
   const [currentRace, setCurrentRace] = React.useState({});
   const [debugContent, setDebugContent] = React.useState('');
+  const [identifyFinisher, setIdentifyFinisher] = React.useState(false);
 
   const initialiseFromLocalStorage = () => {
     //need to handle case where race is finished
@@ -33,10 +32,9 @@ const Timing = ({ navigation }) => {
       .then((timestamp: string | null) => {
         if (timestamp) {
           setStartTime(parseInt(timestamp));
-          if (!finished) {
-            setShowStarted(true);
-            setDisplayButtons(true);
-          }
+          //           if (!finished) {
+          //             setShowStarted(true);
+          //           }
         }
       })
       .catch((e) => setDebugContent(JSON.stringify(e)));
@@ -51,6 +49,29 @@ const Timing = ({ navigation }) => {
       });
     }
   });
+
+  const selectRecord = (entrantObj) => {
+    setIdentifyFinisher(true);
+    console.log(entrantObj);
+  };
+
+  const getEntrantLine = (entrantObj) => {
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          selectRecord(entrantObj);
+        }}
+      >
+        <EntrantRecordLine
+          record={entrantObj}
+          fieldsToDisplay={[
+            ...Object.keys(entrantObj).slice(0, 2),
+            'finishtime',
+          ]}
+        />
+      </TouchableOpacity>
+    );
+  };
 
   //TODO refactor this out of the component
   const writeTime = (entrantId: string = 'unknown') => {
@@ -70,16 +91,7 @@ const Timing = ({ navigation }) => {
             const timeString = moment(elapsed).format('HH:mm:ss.S');
             entrantObj.position = finishrows.length + 1;
             entrantObj.finishtime = timeString;
-            const newFinishrows = [
-              ...finishrows,
-              <EntrantRecordLine
-                record={entrantObj}
-                fieldsToDisplay={[
-                  ...Object.keys(entrantObj).slice(0, 2),
-                  'finishtime',
-                ]}
-              />,
-            ];
+            const newFinishrows = [...finishrows, getEntrantLine(entrantObj)];
             setFinishrows(newFinishrows);
           })
           .catch((e) => setDebugContent(JSON.stringify(e.message)));
@@ -114,21 +126,20 @@ const Timing = ({ navigation }) => {
     setStartTime(now);
     LocalStorage.setStartTime(Utils.getRaceKey(currentRace), now);
     setShowStarted(true);
-    setDisplayButtons(true);
   };
 
-  const finishRace = () => {
-    setShowStarted(false);
-    NfcManager.cancelTechnologyRequest().catch((e) =>
-      Alert.alert(JSON.stringify(e))
-    );
-    //displayResultsFromLocalContent();
-
-    setDisplayButtons(false);
-    setFinished(true);
-    setShowStarted(false);
-    navigation.jumpTo('Identify');
-  };
+  //   const finishRace = () => {
+  //     setShowStarted(false);
+  //     NfcManager.cancelTechnologyRequest().catch((e) =>
+  //       Alert.alert(JSON.stringify(e))
+  //     );
+  //     //displayResultsFromLocalContent();
+  //
+  //     setDisplayButtons(false);
+  //     setFinished(true);
+  //     setShowStarted(false);
+  //     navigation.jumpTo('Identify');
+  //   };
 
   return (
     <View>
@@ -156,13 +167,21 @@ const Timing = ({ navigation }) => {
       <Text>{debugContent}</Text>
       <Text>{resultsContent}</Text>
 
-      <Button
+      {identifyFinisher ? (
+        <View style={styles.RegisterEntryBox}>
+          <Text>Enter ID or present chip</Text>
+        </View>
+      ) : (
+        ''
+      )}
+
+      {/*<Button
         onPress={() => {
           finishRace();
         }}
         disabled={!displayButtons || showStarted}
         title="Finish"
-      />
+      />*/}
     </View>
   );
 };
