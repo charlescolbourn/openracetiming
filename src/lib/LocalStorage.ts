@@ -18,11 +18,13 @@ export default class LocalStorage {
     id: string
   ) {
     // catch and write might not be necessary
+    // it handles the case where the db doesn't yet exist
     return AsyncStorage.getItem(`@ORT_finishtimes:${racekey}`)
       .then((times) => {
         LocalStorage.writeFinishToStorage(times, racekey, timestamp, id);
       })
-      .catch(() => {
+      .catch((e) => {
+        console.log(e.message);
         LocalStorage.writeFinishToStorage('', racekey, timestamp, id);
       });
   }
@@ -33,8 +35,8 @@ export default class LocalStorage {
     timestamp: number,
     id: string
   ) {
-    let timesObj = times ? JSON.parse(times) : {};
-    timesObj[id] = timestamp;
+    let timesObj = times ? JSON.parse(times) : [];
+    timesObj.push({ [id]: timestamp });
     return AsyncStorage.setItem(
       `@ORT_finishtimes:${racekey}`,
       JSON.stringify(timesObj)

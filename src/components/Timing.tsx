@@ -52,6 +52,7 @@ const Timing = ({ navigation }) => {
     }
   });
 
+  //TODO refactor this out of the component
   const writeTime = (entrantId: string = 'unknown') => {
     const timeNow = Date.now();
     const elapsed = timeNow - startTime;
@@ -64,8 +65,10 @@ const Timing = ({ navigation }) => {
         LocalStorage.getEntrant(Utils.getRaceKey(currentRace), entrantId)
           .then((entrant) => {
             let entrantObj = JSON.parse(entrant);
+            entrantObj = entrantObj ? entrantObj : { name: 'unknown' };
 
             const timeString = moment(elapsed).format('HH:mm:ss.S');
+            entrantObj.position = finishrows.length + 1;
             entrantObj.finishtime = timeString;
             const newFinishrows = [
               ...finishrows,
@@ -137,7 +140,6 @@ const Timing = ({ navigation }) => {
             writeTime();
           }}
           title="Record a finish"
-          disabled={showStarted}
         />
       ) : (
         <Button
