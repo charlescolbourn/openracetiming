@@ -4,7 +4,7 @@
 
 import React from 'react';
 import NfcManager, { NfcEvents } from 'react-native-nfc-manager';
-import { Text, View, Button, TouchableOpacity } from 'react-native';
+import { Text, View, Button, Alert, TouchableOpacity } from 'react-native';
 import { DataTable } from 'react-native-paper';
 import moment from 'moment';
 import LocalStorage from '../lib/LocalStorage';
@@ -23,18 +23,17 @@ const Timing = () => {
   const [finishrows, setFinishrows] = React.useState([]);
   const [currentRace, setCurrentRace] = React.useState({});
   const [debugContent, setDebugContent] = React.useState('');
-  const [identifyFinisher, setIdentifyFinisher] = React.useState(false);
+  const [finished, setFinished] = React.useState(false);
+  const [selectedFinisher, setSelectedFinisher] = React.useState({});
 
   const initialiseFromLocalStorage = () => {
-    //need to handle case where race is finished
-
     LocalStorage.getStartTime(Utils.getRaceKey(currentRace))
       .then((timestamp: string | null) => {
         if (timestamp) {
           setStartTime(parseInt(timestamp));
-          //           if (!finished) {
-          //             setShowStarted(true);
-          //           }
+          if (!finished) {
+            setShowStarted(true);
+          }
         }
       })
       .catch((e) => setDebugContent(JSON.stringify(e)));
@@ -50,19 +49,19 @@ const Timing = () => {
     }
   });
 
-  const selectRecord = (entrantObj) => {
-    setIdentifyFinisher(true);
-    console.log(entrantObj);
+  const selectRecord = (index, entrantObj) => {
+    setSelectedFinisher(entrantObj);
   };
 
-  const getEntrantLine = (entrantObj) => {
+  const getEntrantLine = (index, entrantObj) => {
     return (
       <TouchableOpacity
         onPress={() => {
-          selectRecord(entrantObj);
+          selectRecord(index, entrantObj);
         }}
       >
         <EntrantRecordLine
+          key={index}
           record={entrantObj}
           fieldsToDisplay={[
             ...Object.keys(entrantObj).slice(0, 2),
@@ -77,6 +76,8 @@ const Timing = () => {
   const writeTime = (entrantId: string = 'unknown') => {
     const timeNow = Date.now();
     const elapsed = timeNow - startTime;
+    const position = finishrows.length + 1;
+
     LocalStorage.writeFinishTime(
       Utils.getRaceKey(currentRace),
       elapsed,
@@ -89,9 +90,12 @@ const Timing = () => {
             entrantObj = entrantObj ? entrantObj : { name: 'unknown' };
 
             const timeString = moment(elapsed).format('HH:mm:ss.S');
-            entrantObj.position = finishrows.length + 1;
+            entrantObj.position = position;
             entrantObj.finishtime = timeString;
-            const newFinishrows = [...finishrows, getEntrantLine(entrantObj)];
+            const newFinishrows = [
+              ...finishrows,
+              getEntrantLine(finishrows.length, entrantObj),
+            ];
             setFinishrows(newFinishrows);
           })
           .catch((e) => setDebugContent(JSON.stringify(e.message)));
@@ -100,19 +104,41 @@ const Timing = () => {
       .catch((e) => setDebugContent(JSON.stringify(e.message)));
   };
 
+  const updateTimeWithIdentity = (id) => {
+    LocalStorage.updateFinishTimeWithId(
+      Utils.getRaceKey(currentRace),
+      id,
+      selectedFinisher.position - 1
+    );
+    updateFinishLineEntryWithId(id);
+    setSelectedFinisher({});
+  };
+
+  const updateFinishLineEntryWithId = (id) => {
+    LocalStorage.getEntrant(Utils.getRaceKey(currentRace), id)
+      .then((entrant) => {
+        let entrantObj = JSON.parse(entrant);
+        entrantObj = entrantObj ? entrantObj : selectedFinisher;
+        const newFinishrows = [...finishrows];
+        const index = selectedFinisher.position - 1;
+        newFinishrows[index] = getEntrantLine(index, entrantObj);
+        console.log(entrantObj);
+        setFinishrows(newFinishrows);
+      })
+      .catch((e) => console.log(e.message));
+  };
+
   React.useEffect(() => {
     const initNfc = async () => {
       await NfcManager.registerTagEvent();
-
-      //   });
-      //
-      //   React.useEffect(() => {
       if (!showStarted) {
         initialiseFromLocalStorage();
       }
       NfcManager.setEventListener(NfcEvents.DiscoverTag, (tag: any) => {
         if (showStarted) {
-          writeTime(tag.id);
+          Object.keys(selectedFinisher).length > 0
+            ? updateTimeWithIdentity(tag.id)
+            : writeTime(tag.id);
         } else {
           setResultsContent('Testing NFC tag: ' + tag.id);
         }
@@ -128,18 +154,15 @@ const Timing = () => {
     setShowStarted(true);
   };
 
-  //   const finishRace = () => {
-  //     setShowStarted(false);
-  //     NfcManager.cancelTechnologyRequest().catch((e) =>
-  //       Alert.alert(JSON.stringify(e))
-  //     );
-  //     //displayResultsFromLocalContent();
-  //
-  //     setDisplayButtons(false);
-  //     setFinished(true);
-  //     setShowStarted(false);
-  //     navigation.jumpTo('Identify');
-  //   };
+  const finishRace = () => {
+    setShowStarted(false);
+    NfcManager.cancelTechnologyRequest().catch((e) =>
+      Alert.alert(JSON.stringify(e))
+    );
+
+    setFinished(true);
+    setShowStarted(false);
+  };
 
   return (
     <View>
@@ -167,7 +190,7 @@ const Timing = () => {
       <Text>{debugContent}</Text>
       <Text>{resultsContent}</Text>
 
-      {identifyFinisher ? (
+      {Object.keys(selectedFinisher).length > 0 ? (
         <View style={styles.RegisterEntryBox}>
           <Text>Enter ID or present chip</Text>
         </View>
@@ -175,13 +198,14 @@ const Timing = () => {
         ''
       )}
 
-      {/*<Button
+      <Button
+        color={styles.button.color}
         onPress={() => {
           finishRace();
         }}
-        disabled={!displayButtons || showStarted}
+        disabled={!showStarted}
         title="Finish"
-      />*/}
+      />
     </View>
   );
 };

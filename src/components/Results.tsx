@@ -46,7 +46,7 @@ const Results = () => {
   const formatResults = (results, callback) => {
     return Promise.all(
       results.map((entry) => {
-        let key = Object.keys(entry)[0];
+        let key = entry.id;
         return LocalStorage.getEntrant(Utils.getRaceKey(currentRace), key)
           .then((entrantRecordString) => {
             let extendedEntrantRecord = entrantRecordString
@@ -57,7 +57,7 @@ const Results = () => {
             );
             return callback(extendedEntrantRecord);
           })
-          .catch((e) => console.log('mushroom ' + e.message));
+          .catch((e) => console.log(e.message));
       })
     );
   };
@@ -66,12 +66,10 @@ const Results = () => {
     const stringResults = await LocalStorage.getResults(
       Utils.getRaceKey(currentRace)
     );
-    console.log(stringResults);
     const resultsJson = await formatResults(
       JSON.parse(stringResults),
       (record) => record
     );
-    console.log(JSON.stringify(resultsJson));
 
     const csvString = jsonToCSV(resultsJson);
     let dir = await ScopedStorage.openDocumentTree(true);

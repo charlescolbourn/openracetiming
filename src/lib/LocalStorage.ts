@@ -29,6 +29,27 @@ export default class LocalStorage {
       });
   }
 
+  public static updateFinishTimeWithId(
+    racekey: string,
+    id: string,
+    index: number
+  ) {
+    return AsyncStorage.getItem(`@ORT_finishtimes:${racekey}`)
+      .then((timesString) => {
+        console.log(index);
+        let times = JSON.parse(timesString);
+        times[index].id = id;
+        console.log({ id: id });
+        AsyncStorage.setItem(
+          `@ORT_finishtimes:${racekey}`,
+          JSON.stringify(times)
+        );
+      })
+      .catch((e) => {
+        console.log(e.message);
+      });
+  }
+
   private static writeFinishToStorage(
     times: string,
     racekey: string,
@@ -66,7 +87,7 @@ export default class LocalStorage {
 
   public static addToStarterList(racekey: string, record: string) {
     return AsyncStorage.setItem(
-      `@ORT_entrantsByKey:${racekey}:${record.nfcId}`,
+      `@ORT_entrantsByKey:${racekey}:${record.id}`,
       JSON.stringify(record)
     );
   }
