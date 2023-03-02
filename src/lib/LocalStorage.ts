@@ -36,10 +36,8 @@ export default class LocalStorage {
   ) {
     return AsyncStorage.getItem(`@ORT_finishtimes:${racekey}`)
       .then((timesString) => {
-        console.log(index);
         let times = JSON.parse(timesString);
         times[index].id = id;
-        console.log({ id: id });
         AsyncStorage.setItem(
           `@ORT_finishtimes:${racekey}`,
           JSON.stringify(times)

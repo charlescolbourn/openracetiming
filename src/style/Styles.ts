@@ -18,6 +18,11 @@ export default StyleSheet.create({
   },
   RegisterEntryBox: {
     backgroundColor: '#AAAAAAAA',
+    fontSize: 30,
+    TextInput: {
+      backgroundColor: 'white',
+      fontSize: 20,
+    },
   },
   EntrantRecordLine: {
     fontWeight: 'normal',

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Button } from 'react-native';
+import { View, Button, ScrollView } from 'react-native';
 import { DataTable } from 'react-native-paper';
 import LocalStorage from '../lib/LocalStorage';
 import Utils from '../lib/Utils';
@@ -90,7 +90,9 @@ const Results = () => {
   return (
     <View>
       <CurrentRaceView raceDetails={currentRace} />
-      <DataTable>{resultsData}</DataTable>
+      <ScrollView>
+        <DataTable>{resultsData}</DataTable>
+      </ScrollView>
       <Button
         color={styles.button.color}
         title="reload"

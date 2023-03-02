@@ -4,7 +4,15 @@
 
 import React from 'react';
 import NfcManager, { NfcEvents } from 'react-native-nfc-manager';
-import { Text, View, Button, Alert, TouchableOpacity } from 'react-native';
+import {
+  Text,
+  View,
+  Button,
+  Alert,
+  TouchableOpacity,
+  TextInput,
+  ScrollView,
+} from 'react-native';
 import { DataTable } from 'react-native-paper';
 import moment from 'moment';
 import LocalStorage from '../lib/LocalStorage';
@@ -56,12 +64,12 @@ const Timing = () => {
   const getEntrantLine = (index, entrantObj) => {
     return (
       <TouchableOpacity
+        key={index}
         onPress={() => {
           selectRecord(index, entrantObj);
         }}
       >
         <EntrantRecordLine
-          key={index}
           record={entrantObj}
           fieldsToDisplay={[
             ...Object.keys(entrantObj).slice(0, 2),
@@ -184,15 +192,22 @@ const Timing = () => {
       )}
 
       <Text>{startTime ? new Date(startTime).toLocaleString() : ''}</Text>
-      <View>
+      <ScrollView>
         <DataTable>{finishrows}</DataTable>
-      </View>
+      </ScrollView>
       <Text>{debugContent}</Text>
       <Text>{resultsContent}</Text>
 
       {Object.keys(selectedFinisher).length > 0 ? (
         <View style={styles.RegisterEntryBox}>
-          <Text>Enter ID or present chip</Text>
+          <Text style={styles.RegisterEntryBox}>Enter ID or present chip</Text>
+          <TextInput
+            style={styles.RegisterEntryBox.TextInput}
+            keyboardType="numeric"
+            onSubmitEditing={(event) =>
+              updateTimeWithIdentity(event.nativeEvent.text)
+            }
+          />
         </View>
       ) : (
         ''
