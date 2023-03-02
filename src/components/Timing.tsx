@@ -85,7 +85,6 @@ const Timing = () => {
     const timeNow = Date.now();
     const elapsed = timeNow - startTime;
     const position = finishrows.length + 1;
-
     LocalStorage.writeFinishTime(
       Utils.getRaceKey(currentRace),
       elapsed,
@@ -97,9 +96,11 @@ const Timing = () => {
             let entrantObj = JSON.parse(entrant);
             entrantObj = entrantObj ? entrantObj : { name: 'unknown' };
 
-            const timeString = moment(elapsed).format('HH:mm:ss.S');
+            const timeString = moment(elapsed).format('HH:mm:ss.SSS');
             entrantObj.position = position;
             entrantObj.finishtime = timeString;
+
+            console.log(entrantObj);
             const newFinishrows = [
               ...finishrows,
               getEntrantLine(finishrows.length, entrantObj),
@@ -127,10 +128,11 @@ const Timing = () => {
       .then((entrant) => {
         let entrantObj = JSON.parse(entrant);
         entrantObj = entrantObj ? entrantObj : selectedFinisher;
+        entrantObj.name = entrantObj.id ? entrantObj.name : id;
         const newFinishrows = [...finishrows];
         const index = selectedFinisher.position - 1;
         newFinishrows[index] = getEntrantLine(index, entrantObj);
-        console.log(entrantObj);
+        console.log(newFinishrows[index]);
         setFinishrows(newFinishrows);
       })
       .catch((e) => console.log(e.message));

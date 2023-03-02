@@ -32,11 +32,14 @@ const Results = () => {
         formatResults(JSON.parse(results), (extendedEntrantRecord) => {
           return (
             <EntrantRecordLine
-              key={extendedEntrantRecord.finishtime}
+              key={
+                extendedEntrantRecord.finishtime + extendedEntrantRecord.name
+              }
               record={extendedEntrantRecord}
             />
           );
         }).then((newContent) => {
+          console.log(newContent);
           setResultsData(newContent);
         });
       })
@@ -46,14 +49,14 @@ const Results = () => {
   const formatResults = (results, callback) => {
     return Promise.all(
       results.map((entry) => {
-        let key = entry.id;
+        let key = Object.keys(entry)[0];
         return LocalStorage.getEntrant(Utils.getRaceKey(currentRace), key)
           .then((entrantRecordString) => {
             let extendedEntrantRecord = entrantRecordString
               ? JSON.parse(entrantRecordString)
-              : { name: 'unknown' };
+              : { name: entry.id };
             extendedEntrantRecord.finishtime = moment(entry[key]).format(
-              'HH:mm:ss.S'
+              'HH:mm:ss.SSS'
             );
             return callback(extendedEntrantRecord);
           })
