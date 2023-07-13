@@ -18,12 +18,37 @@ export default class LocalStorage {
     id: string
   ) {
     // catch and write might not be necessary
+    // it handles the case where the db doesn't yet exist
     return AsyncStorage.getItem(`@ORT_finishtimes:${racekey}`)
       .then((times) => {
         LocalStorage.writeFinishToStorage(times, racekey, timestamp, id);
       })
-      .catch(() => {
+      .catch((e) => {
+        console.log(e.message);
         LocalStorage.writeFinishToStorage('', racekey, timestamp, id);
+      });
+  }
+
+  public static updateFinishTimeWithId(
+    racekey: string,
+    id: string,
+    index: number
+  ) {
+    return AsyncStorage.getItem(`@ORT_finishtimes:${racekey}`)
+      .then((timesString) => {
+        let times = JSON.parse(timesString);
+
+        const originalId = Object.keys(times[index])[0];
+        let newTimeEntry = { [id]: times[index][originalId] };
+        newTimeEntry.id = id;
+        times[index] = newTimeEntry;
+        AsyncStorage.setItem(
+          `@ORT_finishtimes:${racekey}`,
+          JSON.stringify(times)
+        );
+      })
+      .catch((e) => {
+        console.log(e.message);
       });
   }
 
@@ -33,8 +58,8 @@ export default class LocalStorage {
     timestamp: number,
     id: string
   ) {
-    let timesObj = times ? JSON.parse(times) : {};
-    timesObj[id] = timestamp;
+    let timesObj = times ? JSON.parse(times) : [];
+    timesObj.push({ [id]: timestamp });
     return AsyncStorage.setItem(
       `@ORT_finishtimes:${racekey}`,
       JSON.stringify(timesObj)
@@ -64,7 +89,7 @@ export default class LocalStorage {
 
   public static addToStarterList(racekey: string, record: string) {
     return AsyncStorage.setItem(
-      `@ORT_entrantsByKey:${racekey}:${record.nfcId}`,
+      `@ORT_entrantsByKey:${racekey}:${record.id}`,
       JSON.stringify(record)
     );
   }

@@ -52,7 +52,7 @@ const Registration = () => {
   };
 
   const selectRecord = (record) => {
-    setNfcRegistered(record.nfcId);
+    setNfcRegistered(record.id);
     setEntryData(record);
     setAddOrEdit(true);
     setDisplaySaveButton(true);
@@ -126,7 +126,8 @@ const Registration = () => {
 
   const registerId = (nfcId: string) => {
     let copyRecords = records;
-    copyRecords[currentlySelectedIndex].nfcId = nfcId;
+    copyRecords[currentlySelectedIndex].id = nfcId;
+    copyRecords[currentlySelectedIndex].highlighted = true;
     setRecords(copyRecords);
     //         Alert.alert(JSON.stringify(parsedData[currentlySelectedIndex]));
     setNfcRegistered(true);
@@ -199,7 +200,7 @@ const Registration = () => {
           />*/}
             <Text>
               {nfcRegistered
-                ? entryData.nfcId
+                ? entryData.id
                 : 'Electronic timing chip not yet registered'}
             </Text>
           </View>

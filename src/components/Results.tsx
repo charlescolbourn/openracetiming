@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, Button } from 'react-native';
+import { View, Button, ScrollView } from 'react-native';
 import { DataTable } from 'react-native-paper';
 import LocalStorage from '../lib/LocalStorage';
 import Utils from '../lib/Utils';
@@ -13,7 +13,6 @@ import CurrentRaceView from './CurrentRaceView';
 const Results = () => {
   const [resultsData, setResultsData] = React.useState([]);
   const [currentRace, setCurrentRace] = React.useState({});
-  const [debug, setDebug] = React.useState('');
 
   React.useEffect(() => {
     if (!currentRace || Object.keys(currentRace).length === 0) {
@@ -23,7 +22,7 @@ const Results = () => {
             setCurrentRace(JSON.parse(raceDetails));
           }
         })
-        .catch((e) => setDebug(e.message));
+        .catch((e) => console.log(e.message));
     }
   });
 
@@ -33,40 +32,35 @@ const Results = () => {
         formatResults(JSON.parse(results), (extendedEntrantRecord) => {
           return (
             <EntrantRecordLine
-              key={extendedEntrantRecord.nfcId}
+              key={
+                extendedEntrantRecord.finishtime + extendedEntrantRecord.name
+              }
               record={extendedEntrantRecord}
             />
           );
         }).then((newContent) => {
-          console.log('setting resultsData');
           console.log(newContent);
           setResultsData(newContent);
         });
       })
-      .catch((e) => setDebug(e.message));
-    // LocalStorage.getResults(Utils.getRaceKey(currentRace)).then( (results) =>
-    // {
-    // const resultsObject = JSON.parse(results);
-    // setDebug(JSON.stringify(Object.keys(resultsObject)));
-    //
-    // }).catch ( (e) => setDebug(e.message));
+      .catch((e) => console.log('badger ' + e.message));
   };
 
   const formatResults = (results, callback) => {
     return Promise.all(
-      Object.keys(results).map((key) => {
+      results.map((entry) => {
+        let key = Object.keys(entry)[0];
         return LocalStorage.getEntrant(Utils.getRaceKey(currentRace), key)
           .then((entrantRecordString) => {
-            let extendedEntrantRecord = JSON.parse(entrantRecordString);
-            extendedEntrantRecord.finishtime = moment(results[key]).format(
-              'HH:mm:ss.S'
+            let extendedEntrantRecord = entrantRecordString
+              ? JSON.parse(entrantRecordString)
+              : { name: entry.id };
+            extendedEntrantRecord.finishtime = moment(entry[key]).format(
+              'HH:mm:ss.SSS'
             );
-            console.log(extendedEntrantRecord);
             return callback(extendedEntrantRecord);
-
-            //setDebug(JSON.stringify(extendedEntrantRecord));
           })
-          .catch((e) => setDebug(e.message));
+          .catch((e) => console.log(e.message));
       })
     );
   };
@@ -75,15 +69,12 @@ const Results = () => {
     const stringResults = await LocalStorage.getResults(
       Utils.getRaceKey(currentRace)
     );
-    console.log(stringResults);
     const resultsJson = await formatResults(
       JSON.parse(stringResults),
       (record) => record
     );
-    console.log(JSON.stringify(resultsJson));
 
     const csvString = jsonToCSV(resultsJson);
-    console.log(csvString);
     let dir = await ScopedStorage.openDocumentTree(true);
     //   write the current list of answers to a local csv file
     const filename = `${currentRace.raceName}_${currentRace.raceDate}.csv`;
@@ -101,9 +92,10 @@ const Results = () => {
 
   return (
     <View>
-      <Text>{debug}</Text>
       <CurrentRaceView raceDetails={currentRace} />
-      <DataTable>{resultsData}</DataTable>
+      <ScrollView>
+        <DataTable>{resultsData}</DataTable>
+      </ScrollView>
       <Button
         color={styles.button.color}
         title="reload"

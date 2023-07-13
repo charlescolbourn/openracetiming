@@ -25,7 +25,7 @@ const EntrantRecordLine: FC<EntrantLineProps> = ({
             <DataTable.Cell
               key={record[key]}
               textStyle={
-                !record.nfcId
+                !record.id
                   ? styles.EntrantRecordLine
                   : styles.EntrantRecordLine.registered
               }
